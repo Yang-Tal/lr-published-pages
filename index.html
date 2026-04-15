@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LR 发布项目索引</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background: #f5f7fa;
+            color: #333;
+            padding: 40px 20px;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        .header h1 {
+            font-size: 28px;
+            color: #1a1a2e;
+            margin-bottom: 8px;
+        }
+        .header p {
+            color: #888;
+            font-size: 14px;
+        }
+        .cards {
+            max-width: 800px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+        .card {
+            background: #fff;
+            border-radius: 12px;
+            padding: 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            text-decoration: none;
+            color: #333;
+            transition: all 0.2s;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+        }
+        .card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+        }
+        .card-info {
+            flex: 1;
+        }
+        .card-info h3 {
+            font-size: 18px;
+            margin-bottom: 6px;
+            color: #1a1a2e;
+        }
+        .card-info p {
+            font-size: 13px;
+            color: #999;
+        }
+        .card-btn {
+            background: #4361ee;
+            color: #fff;
+            padding: 8px 20px;
+            border-radius: 8px;
+            font-size: 14px;
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+        .card:hover .card-btn {
+            background: #3a56d4;
+        }
+        .footer {
+            text-align: center;
+            margin-top: 40px;
+            color: #bbb;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>已发布项目</h1>
+        <p>所有线上网页产物，点击即可查看</p>
+    </div>
+    <div class="cards">
+        <a class="card" href="https://lr-published-pages.vercel.app/小学重点项目规划.html" target="_blank">
+            <div class="card-info">
+                <h3>小学重点项目规划</h3>
+                <p>发布于 2026-04-15</p>
+            </div>
+            <div class="card-btn">打开</div>
+        </a>
+        <a class="card" href="https://lr-published-pages.vercel.app/一起爱学-产品原型.html" target="_blank">
+            <div class="card-info">
+                <h3>一起爱学-产品原型</h3>
+                <p>发布于 2026-04-15</p>
+            </div>
+            <div class="card-btn">打开</div>
+        </a>
+        <a class="card" href="https://lr-published-pages.vercel.app/欧洋与金炎分工说明.html" target="_blank">
+            <div class="card-info">
+                <h3>欧洋与金炎分工说明</h3>
+                <p>发布于 2026-04-15</p>
+            </div>
+            <div class="card-btn">打开</div>
+        </a>
+    </div>
+    <div class="footer">
+        <p>托管于 Vercel · 源码 GitHub</p>
+    </div>
+</body>
+</html>
