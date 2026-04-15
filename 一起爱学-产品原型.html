@@ -1,0 +1,2311 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>一起爱学 - 产品原型</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Microsoft YaHei', sans-serif; background: #f0f2f5; display: flex; height: 100vh; overflow: hidden; }
+
+/* Sidebar */
+.sidebar { width: 240px; background: #1a1a2e; color: #fff; flex-shrink: 0; display: flex; flex-direction: column; overflow-y: auto; }
+.sidebar-header { padding: 20px 16px; border-bottom: 1px solid rgba(255,255,255,0.1); }
+.sidebar-header h1 { font-size: 20px; font-weight: 700; }
+.sidebar-header p { font-size: 11px; color: rgba(255,255,255,0.5); margin-top: 4px; }
+.nav-group { padding: 12px 0; }
+.nav-group-title { padding: 4px 16px; font-size: 11px; color: rgba(255,255,255,0.4); text-transform: uppercase; letter-spacing: 1px; }
+.nav-item { padding: 10px 16px; cursor: pointer; font-size: 13px; display: flex; align-items: center; gap: 8px; transition: all 0.2s; border-left: 3px solid transparent; }
+.nav-item:hover { background: rgba(255,255,255,0.08); }
+.nav-item.active { background: rgba(74,144,226,0.2); border-left-color: #4a90e2; color: #4a90e2; }
+.nav-item .dot { width: 6px; height: 6px; border-radius: 50%; background: rgba(255,255,255,0.3); flex-shrink: 0; }
+.nav-item.active .dot { background: #4a90e2; }
+.nav-badge { margin-left: auto; background: #e74c3c; color: #fff; font-size: 10px; padding: 1px 6px; border-radius: 8px; }
+
+/* Main */
+.main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+.topbar { height: 52px; background: #fff; border-bottom: 1px solid #e8e8e8; display: flex; align-items: center; padding: 0 24px; justify-content: space-between; flex-shrink: 0; }
+.topbar-title { font-size: 16px; font-weight: 600; color: #1a1a2e; }
+.topbar-meta { font-size: 12px; color: #999; }
+.content { flex: 1; overflow-y: auto; padding: 24px; }
+.page { display: none; }
+.page.active { display: block; }
+
+/* Phone Frame */
+.phone-frame { width: 375px; height: 750px; border-radius: 40px; border: 8px solid #1a1a2e; background: #fff; margin: 0 auto; overflow: hidden; position: relative; box-shadow: 0 20px 60px rgba(0,0,0,0.15); }
+.phone-frame::before { content: ''; position: absolute; top: 0; left: 50%; transform: translateX(-50%); width: 120px; height: 24px; background: #1a1a2e; border-radius: 0 0 16px 16px; z-index: 10; }
+.phone-scroll { height: 100%; overflow-y: auto; padding-top: 32px; padding-bottom: 80px; }
+.phone-tabbar { position: absolute; bottom: 0; left: 0; right: 0; height: 64px; background: #fff; border-top: 1px solid #eee; display: flex; align-items: center; justify-content: space-around; }
+.tab-item { text-align: center; font-size: 10px; color: #999; cursor: pointer; }
+.tab-item.active { color: #4a90e2; }
+.tab-item .tab-icon { font-size: 20px; margin-bottom: 2px; }
+
+/* Desktop Frame */
+.desktop-frame { width: 100%; max-width: 1200px; margin: 0 auto; background: #fff; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); overflow: hidden; min-height: 700px; }
+.desktop-header { height: 56px; background: #1a1a2e; color: #fff; display: flex; align-items: center; padding: 0 24px; gap: 24px; }
+.desktop-tab { padding: 14px 16px; cursor: pointer; font-size: 13px; border-bottom: 2px solid transparent; opacity: 0.7; }
+.desktop-tab.active { opacity: 1; border-bottom-color: #4a90e2; }
+.desktop-body { padding: 24px; }
+
+/* Mini Phone Frame (for parent) */
+.mini-phone { width: 375px; height: 680px; border-radius: 32px; border: 6px solid #333; background: #fff; margin: 0 auto; overflow: hidden; position: relative; box-shadow: 0 16px 40px rgba(0,0,0,0.12); }
+.mini-phone::before { content: ''; position: absolute; top: 0; left: 50%; transform: translateX(-50%); width: 100px; height: 20px; background: #333; border-radius: 0 0 12px 12px; z-index: 10; }
+.mini-phone-scroll { height: 100%; overflow-y: auto; padding-top: 28px; padding-bottom: 70px; }
+.mini-tabbar { position: absolute; bottom: 0; left: 0; right: 0; height: 56px; background: #fff; border-top: 1px solid #eee; display: flex; align-items: center; justify-content: space-around; }
+
+/* Cards */
+.card { background: #fff; border-radius: 12px; padding: 16px; margin-bottom: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.04); border: 1px solid #f0f0f0; }
+.stat-card { background: linear-gradient(135deg, #4a90e2, #357abd); color: #fff; border-radius: 12px; padding: 16px; }
+.stat-card.green { background: linear-gradient(135deg, #27ae60, #219a52); }
+.stat-card.orange { background: linear-gradient(135deg, #f39c12, #e67e22); }
+.stat-card.purple { background: linear-gradient(135deg, #8e44ad, #7d3c98); }
+
+/* Tags */
+.tag { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: 500; }
+.tag-red { background: #fde8e8; color: #e74c3c; }
+.tag-orange { background: #fef3e2; color: #f39c12; }
+.tag-green { background: #e8f8f0; color: #27ae60; }
+.tag-blue { background: #e8f0fe; color: #4a90e2; }
+.tag-purple { background: #f0e8fe; color: #8e44ad; }
+
+/* Source trace card */
+.source-card { background: linear-gradient(135deg, #fef9e7 0%, #fdebd0 100%); border: 1px solid #f9e79f; border-radius: 10px; padding: 12px; margin-top: 10px; }
+.source-header { display: flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 600; color: #d4ac0d; margin-bottom: 8px; }
+.source-row { display: flex; align-items: flex-start; gap: 6px; font-size: 11px; color: #7d6608; margin-bottom: 6px; line-height: 1.5; }
+.source-row:last-child { margin-bottom: 0; }
+.source-label { flex-shrink: 0; font-weight: 600; min-width: 60px; }
+.source-icon { flex-shrink: 0; font-size: 14px; }
+
+/* Progress bar */
+.progress-bar { height: 6px; background: #eee; border-radius: 3px; overflow: hidden; }
+.progress-fill { height: 100%; border-radius: 3px; transition: width 0.3s; }
+
+/* Table */
+.data-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+.data-table th { background: #f8f9fa; padding: 10px 12px; text-align: left; font-weight: 600; color: #666; border-bottom: 2px solid #eee; }
+.data-table td { padding: 10px 12px; border-bottom: 1px solid #f0f0f0; color: #333; }
+.data-table tr:hover { background: #f8fbff; }
+
+/* Buttons */
+.btn { padding: 8px 16px; border-radius: 8px; font-size: 13px; cursor: pointer; border: none; font-weight: 500; }
+.btn-primary { background: #4a90e2; color: #fff; }
+.btn-primary:hover { background: #357abd; }
+.btn-outline { background: transparent; color: #4a90e2; border: 1px solid #4a90e2; }
+.btn-sm { padding: 4px 10px; font-size: 11px; }
+
+/* Animations */
+@keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+.page.active { animation: fadeIn 0.3s ease; }
+
+/* Chart placeholder */
+.chart-box { background: #fafbfc; border: 1px dashed #ddd; border-radius: 8px; padding: 16px; text-align: center; min-height: 180px; display: flex; align-items: center; justify-content: center; flex-direction: column; }
+.mini-chart { width: 100%; height: 120px; position: relative; }
+
+/* Radar chart CSS */
+.radar-chart { width: 200px; height: 200px; margin: 0 auto; position: relative; }
+.radar-chart svg { width: 100%; height: 100%; }
+
+/* Score circle */
+.score-circle { width: 80px; height: 80px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 28px; font-weight: 700; color: #fff; margin: 0 auto; }
+
+/* Timeline */
+.timeline { padding-left: 20px; border-left: 2px solid #4a90e2; }
+.timeline-item { position: relative; padding: 0 0 20px 20px; }
+.timeline-item::before { content: ''; position: absolute; left: -26px; top: 4px; width: 10px; height: 10px; border-radius: 50%; background: #4a90e2; border: 2px solid #fff; box-shadow: 0 0 0 2px #4a90e2; }
+.timeline-date { font-size: 11px; color: #999; }
+.timeline-title { font-size: 14px; font-weight: 600; color: #333; margin-top: 2px; }
+.timeline-desc { font-size: 12px; color: #666; margin-top: 4px; }
+
+/* Two column */
+.two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+@media (max-width: 900px) { .two-col { grid-template-columns: 1fr; } }
+
+/* Mini card inside phone */
+.m-card { background: #fff; border-radius: 10px; padding: 14px; margin: 0 12px 10px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); }
+.m-section-title { font-size: 15px; font-weight: 700; color: #1a1a2e; padding: 16px 12px 8px; }
+.m-subtitle { font-size: 12px; color: #999; padding: 0 12px 8px; }
+
+/* Question card */
+.q-card { background: #fff; border-radius: 10px; padding: 14px; margin: 0 12px 10px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); border-left: 3px solid #4a90e2; }
+.q-card.urgent { border-left-color: #e74c3c; }
+.q-card.medium { border-left-color: #f39c12; }
+.q-card.low { border-left-color: #27ae60; }
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-thumb { background: #ccc; border-radius: 2px; }
+
+.page-label { display: inline-block; padding: 3px 10px; border-radius: 4px; font-size: 11px; font-weight: 600; margin-bottom: 8px; }
+.label-student { background: #e8f0fe; color: #4a90e2; }
+.label-parent { background: #e8f8f0; color: #27ae60; }
+.label-teacher { background: #f0e8fe; color: #8e44ad; }
+.label-core { background: #fde8e8; color: #e74c3c; }
+</style>
+</head>
+<body>
+
+<!-- Sidebar Navigation -->
+<div class="sidebar">
+  <div class="sidebar-header">
+    <h1>一起爱学</h1>
+    <p>Product Prototype v1.0</p>
+  </div>
+
+  <div class="nav-group">
+    <div class="nav-group-title">学生端 App</div>
+    <div class="nav-item active" onclick="showPage('s-home')"><span class="dot"></span>首页工作台</div>
+    <div class="nav-item" onclick="showPage('s-diagnosis')"><span class="dot"></span>升学诊断报告</div>
+    <div class="nav-item" onclick="showPage('s-errclear')"><span class="dot"></span>AI错题精准清零</div>
+    <div class="nav-item" onclick="showPage('s-quiz')"><span class="dot"></span>押题与周测</div>
+    <div class="nav-item" onclick="showPage('s-exam')"><span class="dot"></span>试卷拍照收集</div>
+  </div>
+
+  <div class="nav-group">
+    <div class="nav-group-title">家长端小程序</div>
+    <div class="nav-item" onclick="showPage('p-report')"><span class="dot"></span>周学习报告</div>
+    <div class="nav-item" onclick="showPage('p-plan')"><span class="dot"></span>升学规划</div>
+  </div>
+
+  <div class="nav-group">
+    <div class="nav-group-title">辅导老师工作台</div>
+    <div class="nav-item" onclick="showPage('t-dashboard')"><span class="dot"></span>工作台总览</div>
+    <div class="nav-item" onclick="showPage('t-student')"><span class="dot"></span>学生详情</div>
+  </div>
+
+  <div class="nav-group">
+    <div class="nav-group-title">核心交互</div>
+    <div class="nav-item" onclick="showPage('core-trace')"><span class="dot"></span>推荐可溯源</div>
+    <div class="nav-item" onclick="showPage('core-quiz')"><span class="dot"></span>押题效果报告</div>
+  </div>
+</div>
+
+<!-- Main Content -->
+<div class="main">
+  <div class="topbar">
+    <div>
+      <span class="topbar-title" id="topbarTitle">首页工作台</span>
+      <span class="topbar-meta" id="topbarMeta">学生端 App / 首页</span>
+    </div>
+    <div style="font-size:12px; color:#999;">一起爱学 Product Prototype v1.0</div>
+  </div>
+  <div class="content">
+
+<!-- ===================== PAGE 1: 学生端 - 首页工作台 ===================== -->
+<div class="page active" id="page-s-home">
+<div style="text-align:center; margin-bottom:20px;">
+  <span class="page-label label-student">学生端 App</span>
+</div>
+<div class="phone-frame">
+  <div class="phone-scroll" style="background:#f5f6fa;">
+    <!-- Status bar placeholder -->
+    <div style="padding:8px 16px; display:flex; justify-content:space-between; font-size:11px; color:#999;">
+      <span>17:44</span><span>WiFi | 86%</span>
+    </div>
+
+    <!-- Welcome -->
+    <div style="padding:8px 16px 16px;">
+      <div style="display:flex; align-items:center; justify-content:space-between;">
+        <div>
+          <div style="font-size:18px; font-weight:700; color:#1a1a2e;">下午好，小明同学</div>
+          <div style="font-size:12px; color:#999; margin-top:2px;">首都师大附中第一分校 · 初一(3)班</div>
+        </div>
+        <div style="width:40px; height:40px; border-radius:50%; background:linear-gradient(135deg,#4a90e2,#8e44ad); display:flex; align-items:center; justify-content:center; color:#fff; font-size:16px; font-weight:700;">明</div>
+      </div>
+    </div>
+
+    <!-- Exam Countdown -->
+    <div class="m-card" style="background:linear-gradient(135deg,#667eea,#764ba2); color:#fff; border:none;">
+      <div style="display:flex; justify-content:space-between; align-items:center;">
+        <div>
+          <div style="font-size:11px; opacity:0.8;">期末考试倒计时</div>
+          <div style="font-size:28px; font-weight:700; margin-top:4px;">42 天</div>
+          <div style="font-size:11px; opacity:0.7; margin-top:2px;">2026年6月22日 · 七年级下学期期末</div>
+        </div>
+        <div style="text-align:center;">
+          <div style="width:52px; height:52px; border-radius:50%; border:3px solid rgba(255,255,255,0.3); display:flex; align-items:center; justify-content:center;">
+            <div style="font-size:18px; font-weight:700;">68</div>
+          </div>
+          <div style="font-size:10px; opacity:0.7; margin-top:4px;">预测分数</div>
+        </div>
+      </div>
+      <div style="margin-top:10px; display:flex; gap:12px;">
+        <div style="flex:1; background:rgba(255,255,255,0.15); border-radius:6px; padding:6px 8px; font-size:10px;">
+          <div style="opacity:0.7;">知识覆盖率</div>
+          <div style="font-weight:700; font-size:14px;">73%</div>
+        </div>
+        <div style="flex:1; background:rgba(255,255,255,0.15); border-radius:6px; padding:6px 8px; font-size:10px;">
+          <div style="opacity:0.7;">待清零</div>
+          <div style="font-weight:700; font-size:14px;">12 题</div>
+        </div>
+        <div style="flex:1; background:rgba(255,255,255,0.15); border-radius:6px; padding:6px 8px; font-size:10px;">
+          <div style="opacity:0.7;">本周押中</div>
+          <div style="font-weight:700; font-size:14px;">5/7</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Today's Tasks -->
+    <div class="m-section-title">今日学习任务</div>
+    <div class="m-subtitle">AI根据你的学习进度和考试预测生成</div>
+
+    <!-- Task 1 -->
+    <div class="m-card" style="display:flex; gap:12px; align-items:flex-start;">
+      <div style="width:36px; height:36px; border-radius:8px; background:#fde8e8; display:flex; align-items:center; justify-content:center; font-size:18px; flex-shrink:0;">📐</div>
+      <div style="flex:1;">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+          <span style="font-size:13px; font-weight:600;">错题清零 · 一次函数</span>
+          <span class="tag tag-red">紧急</span>
+        </div>
+        <div style="font-size:11px; color:#999; margin-top:4px;">来源：3月周测第3题（错题）+ 期末高频考点</div>
+        <div style="font-size:11px; color:#e74c3c; margin-top:2px;">⚡ 考试出现概率 92%</div>
+        <div class="progress-bar" style="margin-top:8px;"><div class="progress-fill" style="width:30%; background:#e74c3c;"></div></div>
+        <div style="font-size:10px; color:#999; margin-top:2px;">已完成 3/10 题</div>
+      </div>
+    </div>
+
+    <!-- Task 2 -->
+    <div class="m-card" style="display:flex; gap:12px; align-items:flex-start;">
+      <div style="width:36px; height:36px; border-radius:8px; background:#e8f0fe; display:flex; align-items:center; justify-content:center; font-size:18px; flex-shrink:0;">🌍</div>
+      <div style="flex:1;">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+          <span style="font-size:13px; font-weight:600;">错题清零 · 亚洲地理位置</span>
+          <span class="tag tag-orange">重要</span>
+        </div>
+        <div style="font-size:11px; color:#999; margin-top:4px;">来源：智慧笔课堂犹豫标记 + 期中易错点</div>
+        <div style="font-size:11px; color:#f39c12; margin-top:2px;">⚡ 考试出现概率 78%</div>
+        <div class="progress-bar" style="margin-top:8px;"><div class="progress-fill" style="width:60%; background:#f39c12;"></div></div>
+        <div style="font-size:10px; color:#999; margin-top:2px;">已完成 6/10 题</div>
+      </div>
+    </div>
+
+    <!-- Task 3 -->
+    <div class="m-card" style="display:flex; gap:12px; align-items:flex-start;">
+      <div style="width:36px; height:36px; border-radius:8px; background:#e8f8f0; display:flex; align-items:center; justify-content:center; font-size:18px; flex-shrink:0;">📝</div>
+      <div style="flex:1;">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+          <span style="font-size:13px; font-weight:600;">本周押题模拟 · 数学</span>
+          <span class="tag tag-blue">今日</span>
+        </div>
+        <div style="font-size:11px; color:#999; margin-top:4px;">包含5道AI预测高频题，限时30分钟</div>
+        <div style="font-size:11px; color:#4a90e2; margin-top:2px;">📊 知识点覆盖：一次函数、不等式、几何证明</div>
+      </div>
+    </div>
+
+    <!-- Score summary instead of live class -->
+    <div class="m-section-title">今日学习概览</div>
+    <div class="m-card">
+      <div style="display:flex; justify-content:space-between; margin-bottom:10px;">
+        <div style="text-align:center; flex:1;">
+          <div style="font-size:10px; color:#999;">待清零</div>
+          <div style="font-size:20px; font-weight:700; color:#e74c3c;">8题</div>
+          <div style="font-size:10px; color:#999;">本周还剩</div>
+        </div>
+        <div style="text-align:center; flex:1;">
+          <div style="font-size:10px; color:#999;">已完成</div>
+          <div style="font-size:20px; font-weight:700; color:#27ae60;">2题</div>
+          <div style="font-size:10px; color:#27ae60;">+2 ↑</div>
+        </div>
+        <div style="text-align:center; flex:1;">
+          <div style="font-size:10px; color:#999;">押题预测</div>
+          <div style="font-size:20px; font-weight:700; color:#4a90e2;">71%</div>
+          <div style="font-size:10px; color:#999;">命中率</div>
+        </div>
+      </div>
+    </div>
+
+    <div style="height:20px;"></div>
+  </div>
+
+  <!-- Tab bar -->
+  <div class="phone-tabbar">
+    <div class="tab-item active"><div class="tab-icon">🏠</div><div>首页</div></div>
+    <div class="tab-item"><div class="tab-icon">📚</div><div>错题</div></div>
+    <div class="tab-item"><div class="tab-icon">🎯</div><div>押题</div></div>
+    <div class="tab-item"><div class="tab-icon">📸</div><div>收集</div></div>
+    <div class="tab-item"><div class="tab-icon">👤</div><div>我的</div></div>
+  </div>
+</div>
+</div>
+
+<!-- ===================== PAGE 2: 学生端 - 升学诊断报告 ===================== -->
+<div class="page" id="page-s-diagnosis">
+<div style="text-align:center; margin-bottom:20px;">
+  <span class="page-label label-student">学生端 App</span>
+</div>
+<div class="phone-frame">
+  <div class="phone-scroll" style="background:#f5f6fa;">
+    <div style="padding:8px 16px; display:flex; justify-content:space-between; font-size:11px; color:#999;">
+      <span>17:44</span><span>WiFi | 86%</span>
+    </div>
+
+    <!-- Header -->
+    <div style="padding:8px 16px 12px; display:flex; align-items:center; gap:12px;">
+      <div style="font-size:20px;">←</div>
+      <div style="font-size:17px; font-weight:700; color:#1a1a2e;">升学诊断报告</div>
+    </div>
+
+    <!-- School Score Card -->
+    <div class="m-card" style="background:linear-gradient(135deg,#1a1a2e,#2d2d5e); color:#fff; border:none;">
+      <div style="display:flex; justify-content:space-between; align-items:center;">
+        <div>
+          <div style="font-size:11px; opacity:0.7;">目标高中</div>
+          <div style="font-size:18px; font-weight:700; margin-top:4px;">首都师范大学附属中学</div>
+          <div style="font-size:11px; opacity:0.6; margin-top:2px;">2025年录取线：546分（满分580）</div>
+        </div>
+        <div class="score-circle" style="background:linear-gradient(135deg,#f39c12,#e67e22);">
+          94.1<span style="font-size:12px;">%</span>
+        </div>
+      </div>
+      <div style="margin-top:12px; padding-top:12px; border-top:1px solid rgba(255,255,255,0.15);">
+        <div style="display:flex; justify-content:space-between; font-size:11px;">
+          <span style="opacity:0.7;">当前预估总分</span>
+          <span style="font-weight:600;">524 / 580</span>
+        </div>
+        <div style="display:flex; justify-content:space-between; font-size:11px; margin-top:4px;">
+          <span style="opacity:0.7;">与目标差距</span>
+          <span style="font-weight:600; color:#f39c12;">22分</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Path Options -->
+    <div class="m-section-title">升学路径分析</div>
+    <div class="m-card" style="border-left:3px solid #27ae60;">
+      <div style="display:flex; justify-content:space-between; align-items:center;">
+        <span style="font-size:14px; font-weight:600;">路径一：校额到校</span>
+        <span class="tag tag-green">推荐</span>
+      </div>
+      <div style="font-size:11px; color:#666; margin-top:6px; line-height:1.6;">
+        通过校内排名分配名额，您的校内排名为 <b style="color:#27ae60;">第12名/共240人</b>，处于前5%，符合校额到校资格。参考近3年数据，排名前8%的学生均有机会通过此路径录取。
+      </div>
+      <div style="margin-top:8px; padding:8px; background:#e8f8f0; border-radius:6px; font-size:11px; color:#27ae60;">
+        ✓ 匹配度 95% · 需保持校内排名前8%
+      </div>
+    </div>
+
+    <div class="m-card" style="border-left:3px solid #4a90e2;">
+      <div style="display:flex; justify-content:space-between; align-items:center;">
+        <span style="font-size:14px; font-weight:600;">路径二："1+3"项目</span>
+        <span class="tag tag-blue">备选</span>
+      </div>
+      <div style="font-size:11px; color:#666; margin-top:6px; line-height:1.6;">
+        初二结束后直升高中，跳过中考。需满足综合评价B等级以上，且校内排名前15%。当前排名符合条件，但需持续提升综合素质评分。
+      </div>
+      <div style="margin-top:8px; padding:8px; background:#e8f0fe; border-radius:6px; font-size:11px; color:#4a90e2;">
+        ⚠ 匹配度 78% · 综合评价需从B+提升至A-
+      </div>
+    </div>
+
+    <div class="m-card" style="border-left:3px solid #999;">
+      <div style="display:flex; justify-content:space-between; align-items:center;">
+        <span style="font-size:14px; font-weight:600;">路径三：统一招生</span>
+        <span class="tag" style="background:#f0f0f0; color:#999;">冲刺</span>
+      </div>
+      <div style="font-size:11px; color:#666; margin-top:6px; line-height:1.6;">
+        统考成绩需达到546分以上，当前预估524分，差距22分。按当前提分速度（月均+6分），期末有望达到550分。
+      </div>
+      <div style="margin-top:8px; padding:8px; background:#f5f5f5; border-radius:6px; font-size:11px; color:#999;">
+        ⚡ 匹配度 62% · 需期末达到550分
+      </div>
+    </div>
+
+    <!-- Knowledge Radar -->
+    <div class="m-section-title">学科知识掌握度</div>
+    <div class="m-card">
+      <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:12px; text-align:center;">
+        <div>
+          <div style="width:60px; height:60px; border-radius:50%; border:4px solid #e74c3c; display:flex; align-items:center; justify-content:center; margin:0 auto; font-size:18px; font-weight:700; color:#e74c3c;">62</div>
+          <div style="font-size:12px; font-weight:600; margin-top:6px;">数学</div>
+          <div style="font-size:10px; color:#e74c3c;">需重点提升</div>
+        </div>
+        <div>
+          <div style="width:60px; height:60px; border-radius:50%; border:4px solid #f39c12; display:flex; align-items:center; justify-content:center; margin:0 auto; font-size:18px; font-weight:700; color:#f39c12;">75</div>
+          <div style="font-size:12px; font-weight:600; margin-top:6px;">英语</div>
+          <div style="font-size:10px; color:#f39c12;">有提升空间</div>
+        </div>
+        <div>
+          <div style="width:60px; height:60px; border-radius:50%; border:4px solid #27ae60; display:flex; align-items:center; justify-content:center; margin:0 auto; font-size:18px; font-weight:700; color:#27ae60;">88</div>
+          <div style="font-size:12px; font-weight:600; margin-top:6px;">语文</div>
+          <div style="font-size:10px; color:#27ae60;">掌握良好</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Weakness Details -->
+    <div class="m-section-title">薄弱知识点分级</div>
+    <div class="m-card" style="border-left:3px solid #e74c3c;">
+      <div style="display:flex; justify-content:space-between;">
+        <span style="font-size:13px; font-weight:600; color:#e74c3c;">🔴 紧急 · 一次函数图像</span>
+        <span style="font-size:11px; color:#999;">数学</span>
+      </div>
+      <div style="font-size:11px; color:#666; margin-top:4px; line-height:1.5;">连续3次测试出错，掌握度仅38%。期末考试预计占12分，出现概率极高。</div>
+      <div style="display:flex; gap:6px; margin-top:8px;">
+        <span class="tag tag-red">掌握度 38%</span>
+        <span class="tag tag-red">考试占分 12</span>
+        <span class="tag tag-red">出现概率 95%</span>
+      </div>
+    </div>
+
+    <div class="m-card" style="border-left:3px solid #e74c3c;">
+      <div style="display:flex; justify-content:space-between;">
+        <span style="font-size:13px; font-weight:600; color:#e74c3c;">🔴 紧急 · 全等三角形证明</span>
+        <span style="font-size:11px; color:#999;">数学</span>
+      </div>
+      <div style="font-size:11px; color:#666; margin-top:4px; line-height:1.5;">月考扣分最多知识点，2次测试出错。期末必考大题，预计占8分。</div>
+      <div style="display:flex; gap:6px; margin-top:8px;">
+        <span class="tag tag-red">掌握度 42%</span>
+        <span class="tag tag-red">考试占分 8</span>
+        <span class="tag tag-red">出现概率 90%</span>
+      </div>
+    </div>
+
+    <div class="m-card" style="border-left:3px solid #f39c12;">
+      <div style="display:flex; justify-content:space-between;">
+        <span style="font-size:13px; font-weight:600; color:#f39c12;">🟡 重要 · 亚洲地理特征</span>
+        <span style="font-size:11px; color:#999;">地理</span>
+      </div>
+      <div style="font-size:11px; color:#666; margin-top:4px; line-height:1.5;">课堂智慧笔犹豫标记达6次，说明理解不牢固。期末选择+综合题预计占6分。</div>
+      <div style="display:flex; gap:6px; margin-top:8px;">
+        <span class="tag tag-orange">掌握度 55%</span>
+        <span class="tag tag-orange">考试占分 6</span>
+        <span class="tag tag-orange">出现概率 80%</span>
+      </div>
+    </div>
+
+    <div class="m-card" style="border-left:3px solid #f39c12;">
+      <div style="display:flex; justify-content:space-between;">
+        <span style="font-size:13px; font-weight:600; color:#f39c12;">🟡 重要 · 完形填空技巧</span>
+        <span style="font-size:11px; color:#999;">英语</span>
+      </div>
+      <div style="font-size:11px; color:#666; margin-top:4px; line-height:1.5;">月考完形填空正确率仅60%。期末通常2篇完形，占10分。</div>
+      <div style="display:flex; gap:6px; margin-top:8px;">
+        <span class="tag tag-orange">掌握度 60%</span>
+        <span class="tag tag-orange">考试占分 10</span>
+        <span class="tag tag-orange">出现概率 85%</span>
+      </div>
+    </div>
+
+    <div class="m-card" style="border-left:3px solid #27ae60;">
+      <div style="display:flex; justify-content:space-between;">
+        <span style="font-size:13px; font-weight:600; color:#27ae60;">🟢 关注 · 因式分解</span>
+        <span style="font-size:11px; color:#999;">数学</span>
+      </div>
+      <div style="font-size:11px; color:#666; margin-top:4px; line-height:1.5;">偶尔出错，需巩固。期末可能与方程结合出大题。</div>
+      <div style="display:flex; gap:6px; margin-top:8px;">
+        <span class="tag tag-green">掌握度 72%</span>
+        <span class="tag tag-green">考试占分 4</span>
+        <span class="tag tag-green">出现概率 65%</span>
+      </div>
+    </div>
+
+    <!-- Key Milestones -->
+    <div class="m-section-title">关键时间节点</div>
+    <div class="m-card">
+      <div class="timeline">
+        <div class="timeline-item">
+          <div class="timeline-date">2026年5月15日</div>
+          <div class="timeline-title">"1+3"项目报名截止</div>
+          <div class="timeline-desc">如选择此路径，需在此日期前完成报名和材料提交</div>
+        </div>
+        <div class="timeline-item">
+          <div class="timeline-date">2026年5月20日</div>
+          <div class="timeline-title">校额到校资格审核</div>
+          <div class="timeline-desc">学校公示校额到校名额分配，需保持校内排名</div>
+        </div>
+        <div class="timeline-item">
+          <div class="timeline-date">2026年6月22-24日</div>
+          <div class="timeline-title">期末考试</div>
+          <div class="timeline-desc">最终统考，目标分数550+，冲刺统招路径</div>
+        </div>
+      </div>
+    </div>
+
+    <div style="height:20px;"></div>
+  </div>
+
+  <div class="phone-tabbar">
+    <div class="tab-item"><div class="tab-icon">🏠</div><div>首页</div></div>
+    <div class="tab-item active"><div class="tab-icon">📚</div><div>错题</div></div>
+    <div class="tab-item"><div class="tab-icon">🎯</div><div>押题</div></div>
+    <div class="tab-item"><div class="tab-icon">📸</div><div>收集</div></div>
+    <div class="tab-item"><div class="tab-icon">👤</div><div>我的</div></div>
+  </div>
+</div>
+</div>
+
+<!-- ===================== PAGE 3: 学生端 - AI错题精准清零 ===================== -->
+<div class="page" id="page-s-errclear">
+<div style="text-align:center; margin-bottom:20px;">
+  <span class="page-label label-student">学生端 App</span>
+</div>
+<div class="phone-frame">
+  <div class="phone-scroll" style="background:#f5f6fa;">
+    <div style="padding:8px 16px; display:flex; justify-content:space-between; font-size:11px; color:#999;">
+      <span>17:44</span><span>WiFi | 86%</span>
+    </div>
+
+    <!-- Header -->
+    <div style="padding:8px 16px 12px; display:flex; align-items:center; gap:12px;">
+      <div style="font-size:20px;">←</div>
+      <div style="font-size:17px; font-weight:700; color:#1a1a2e;">AI错题精准清零</div>
+    </div>
+
+    <!-- Progress Overview -->
+    <div class="m-card" style="background:linear-gradient(135deg,#667eea,#764ba2); color:#fff; border:none;">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+        <div>
+          <div style="font-size:11px; opacity:0.8;">本周清零进度</div>
+          <div style="font-size:26px; font-weight:700;">2/10 题</div>
+        </div>
+        <div style="text-align:right; font-size:11px; opacity:0.8;">
+          <div>第7周 · 4.7 - 4.13</div>
+          <div>还剩 8 题</div>
+        </div>
+      </div>
+      <div style="height:8px; background:rgba(255,255,255,0.2); border-radius:4px; overflow:hidden;">
+        <div style="height:100%; width:20%; background:#fff; border-radius:4px;"></div>
+      </div>
+      <div style="display:flex; justify-content:space-between; font-size:10px; opacity:0.7; margin-top:8px;">
+        <span>每周10道，本周截止周日</span>
+        <span>连续打卡 5 周</span>
+      </div>
+    </div>
+
+    <!-- Weekly History -->
+    <div class="m-section-title">近5周清零记录</div>
+    <div style="display:flex; gap:6px; padding:0 12px; margin-bottom:12px;">
+      <div style="flex:1; text-align:center; padding:8px 4px; background:#e8f8f0; border-radius:8px;">
+        <div style="font-size:10px; color:#999;">第3周</div>
+        <div style="font-size:16px; font-weight:700; color:#27ae60;">10/10</div>
+        <div style="font-size:9px; color:#27ae60;">全部完成</div>
+      </div>
+      <div style="flex:1; text-align:center; padding:8px 4px; background:#e8f8f0; border-radius:8px;">
+        <div style="font-size:10px; color:#999;">第4周</div>
+        <div style="font-size:16px; font-weight:700; color:#27ae60;">10/10</div>
+        <div style="font-size:9px; color:#27ae60;">全部完成</div>
+      </div>
+      <div style="flex:1; text-align:center; padding:8px 4px; background:#e8f8f0; border-radius:8px;">
+        <div style="font-size:10px; color:#999;">第5周</div>
+        <div style="font-size:16px; font-weight:700; color:#27ae60;">10/10</div>
+        <div style="font-size:9px; color:#27ae60;">全部完成</div>
+      </div>
+      <div style="flex:1; text-align:center; padding:8px 4px; background:#e8f8f0; border-radius:8px;">
+        <div style="font-size:10px; color:#999;">第6周</div>
+        <div style="font-size:16px; font-weight:700; color:#27ae60;">10/10</div>
+        <div style="font-size:9px; color:#27ae60;">全部完成</div>
+      </div>
+      <div style="flex:1; text-align:center; padding:8px 4px; background:#fef3e2; border-radius:8px; border:2px solid #f39c12;">
+        <div style="font-size:10px; color:#f39c12;">第7周</div>
+        <div style="font-size:16px; font-weight:700; color:#f39c12;">2/10</div>
+        <div style="font-size:9px; color:#f39c12;">进行中</div>
+      </div>
+    </div>
+
+    <!-- Clear Path Steps -->
+    <div class="m-section-title">本周清零任务</div>
+    <div class="m-subtitle">AI根据你的薄弱点智能分配，每周10道，循序渐进清零</div>
+
+    <!-- Step indicators for weekly progress -->
+    <div style="display:flex; align-items:center; padding:0 12px; gap:4px; margin-bottom:12px;">
+      <div style="flex:1; height:4px; background:#27ae60; border-radius:2px;"></div>
+      <div style="flex:1; height:4px; background:#27ae60; border-radius:2px;"></div>
+      <div style="flex:1; height:4px; background:#4a90e2; border-radius:2px; position:relative;">
+        <div style="position:absolute; top:-8px; left:50%; transform:translateX(-50%); width:16px; height:16px; background:#4a90e2; border-radius:50%; border:2px solid #fff; box-shadow:0 1px 4px rgba(0,0,0,0.2);"></div>
+      </div>
+      <div style="flex:1; height:4px; background:#eee; border-radius:2px;"></div>
+      <div style="flex:1; height:4px; background:#eee; border-radius:2px;"></div>
+      <div style="flex:1; height:4px; background:#eee; border-radius:2px;"></div>
+      <div style="flex:1; height:4px; background:#eee; border-radius:2px;"></div>
+      <div style="flex:1; height:4px; background:#eee; border-radius:2px;"></div>
+      <div style="flex:1; height:4px; background:#eee; border-radius:2px;"></div>
+      <div style="flex:1; height:4px; background:#eee; border-radius:2px;"></div>
+    </div>
+    <div style="display:flex; justify-content:space-between; padding:0 12px; font-size:10px; color:#999; margin-bottom:12px;">
+      <span style="color:#27ae60;">✓ 第1题</span>
+      <span style="color:#27ae60;">✓ 第2题</span>
+      <span style="color:#4a90e2; font-weight:600;">▶ 第3题</span>
+      <span>4</span><span>5</span><span>6</span><span>7</span><span>8</span><span>9</span><span>10</span>
+    </div>
+
+    <!-- Question Card 1 - with WHY -->
+    <div class="q-card urgent">
+      <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+        <div style="flex:1;">
+          <div style="display:flex; align-items:center; gap:6px; margin-bottom:8px;">
+            <span class="tag tag-red">紧急</span>
+            <span style="font-size:10px; color:#999;">本周第3题 / 共10题</span>
+          </div>
+          <div style="font-size:13px; font-weight:600; color:#1a1a2e; margin-bottom:8px;">一次函数 y = kx + b 的图像过点(2, 5)和点(4, 9)，求 k 和 b 的值，并判断点(1, 3)是否在该函数图像上。</div>
+        </div>
+        <div style="width:36px; height:36px; border-radius:8px; background:#fde8e8; display:flex; align-items:center; justify-content:center; font-size:11px; color:#e74c3c; font-weight:700; flex-shrink:0;">10分</div>
+      </div>
+
+      <!-- WHY THIS QUESTION - Source Trace -->
+      <div class="source-card">
+        <div class="source-header">
+          <span>🔍</span> 为什么要做这道题
+        </div>
+        <div class="source-row">
+          <span class="source-icon">📍</span>
+          <span class="source-label">来源追踪</span>
+          <span>3月28日周测第3题（你选错了C，正确答案是B），原题考查待定系数法求解析式</span>
+        </div>
+        <div class="source-row">
+          <span class="source-icon">🎯</span>
+          <span class="source-label">薄弱知识点</span>
+          <span><b style="color:#e74c3c;">一次函数 · 待定系数法</b>，你的掌握度仅38%，低于班级平均71%</span>
+        </div>
+        <div class="source-row">
+          <span class="source-icon">⚡</span>
+          <span class="source-label">考试概率</span>
+          <span>期末考试出现概率 <b style="color:#e74c3c;">92%</b>，预计占 <b>8-12分</b>（选择题+解答题）</span>
+        </div>
+        <div class="source-row">
+          <span class="source-icon">✏️</span>
+          <span class="source-label">智慧笔数据</span>
+          <span>4月2日课堂练习时，你在本题第2步停留 <b>3分12秒</b>（班级平均1分30秒），犹豫明显</span>
+        </div>
+      </div>
+
+      <div style="display:flex; gap:8px; margin-top:12px;">
+        <button class="btn btn-primary" style="flex:1; border-radius:8px; font-size:12px;">开始作答</button>
+        <button class="btn btn-outline" style="border-radius:8px; font-size:12px; padding:8px 12px;">💡 提示</button>
+      </div>
+    </div>
+
+    <!-- Question Card 2 - with WHY -->
+    <div class="q-card urgent">
+      <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+        <div style="flex:1;">
+          <div style="display:flex; align-items:center; gap:6px; margin-bottom:8px;">
+            <span class="tag tag-red">紧急</span>
+            <span style="font-size:10px; color:#999;">本周第4题 / 共10题</span>
+          </div>
+          <div style="font-size:13px; font-weight:600; color:#1a1a2e; margin-bottom:8px;">已知一次函数 y = -2x + 4，画出函数图像，并回答：当 x 取何值时，y > 0？图像与坐标轴围成的三角形面积是多少？</div>
+        </div>
+        <div style="width:36px; height:36px; border-radius:8px; background:#fde8e8; display:flex; align-items:center; justify-content:center; font-size:11px; color:#e74c3c; font-weight:700; flex-shrink:0;">12分</div>
+      </div>
+
+      <div class="source-card">
+        <div class="source-header">
+          <span>🔍</span> 为什么要做这道题
+        </div>
+        <div class="source-row">
+          <span class="source-icon">📍</span>
+          <span class="source-label">来源追踪</span>
+          <span>4月月测第8题（解答题扣4分），你只画出了图像但没能正确计算三角形面积</span>
+        </div>
+        <div class="source-row">
+          <span class="source-icon">🎯</span>
+          <span class="source-label">薄弱知识点</span>
+          <span><b style="color:#e74c3c;">一次函数 · 图像与坐标轴围成面积</b>，掌握度仅30%，班级平均68%</span>
+        </div>
+        <div class="source-row">
+          <span class="source-icon">⚡</span>
+          <span class="source-label">考试概率</span>
+          <span>期末出现概率 <b style="color:#e74c3c;">88%</b>，通常作为解答题第19题出现，预计占 <b>6-8分</b></span>
+        </div>
+        <div class="source-row">
+          <span class="source-icon">📊</span>
+          <span class="source-label">历史数据</span>
+          <span>近3年首师大附中第一分校期末试卷，此题型100%出现，平均分仅4.2/8分</span>
+        </div>
+      </div>
+
+      <div style="display:flex; gap:8px; margin-top:12px;">
+        <button class="btn btn-primary" style="flex:1; border-radius:8px; font-size:12px;">开始作答</button>
+        <button class="btn btn-outline" style="border-radius:8px; font-size:12px; padding:8px 12px;">💡 提示</button>
+      </div>
+    </div>
+
+    <!-- Question Card 3 - with WHY (medium priority) -->
+    <div class="q-card medium">
+      <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+        <div style="flex:1;">
+          <div style="display:flex; align-items:center; gap:6px; margin-bottom:8px;">
+            <span class="tag tag-orange">重要</span>
+            <span style="font-size:10px; color:#999;">本周第5题 / 共10题</span>
+          </div>
+          <div style="font-size:13px; font-weight:600; color:#1a1a2e; margin-bottom:8px;">某地出租车收费标准：3公里以内10元，超过3公里部分每公里2元。写出车费y（元）与行驶路程x（公里）之间的函数关系式，并画出图像。</div>
+        </div>
+        <div style="width:36px; height:36px; border-radius:8px; background:#fef3e2; display:flex; align-items:center; justify-content:center; font-size:11px; color:#f39c12; font-weight:700; flex-shrink:0;">8分</div>
+      </div>
+
+      <div class="source-card" style="background:linear-gradient(135deg,#e8f8f0,#e8f0fe); border-color:#a9cce3;">
+        <div class="source-header" style="color:#4a90e2;">
+          <span>🔍</span> 为什么要做这道题
+        </div>
+        <div class="source-row" style="color:#2c3e50;">
+          <span class="source-icon">📍</span>
+          <span class="source-label">来源追踪</span>
+          <span>期中考试第16题（应用题，你得分4/8），未正确建立分段函数模型</span>
+        </div>
+        <div class="source-row" style="color:#2c3e50;">
+          <span class="source-icon">🎯</span>
+          <span class="source-label">薄弱知识点</span>
+          <span><b style="color:#f39c12;">一次函数 · 实际应用（分段函数）</b>，掌握度52%，属于中频易错点</span>
+        </div>
+        <div class="source-row" style="color:#2c3e50;">
+          <span class="source-icon">⚡</span>
+          <span class="source-label">考试概率</span>
+          <span>期末出现概率 <b style="color:#f39c12;">75%</b>，通常作为应用题出现，预计占 <b>6-8分</b></span>
+        </div>
+        <div class="source-row" style="color:#2c3e50;">
+          <span class="source-icon">✏️</span>
+          <span class="source-label">智慧笔数据</span>
+          <span>课堂练习时你在"分段讨论"这一步反复修改答案2次，说明对分段条件不确定</span>
+        </div>
+      </div>
+
+      <div style="display:flex; gap:8px; margin-top:12px;">
+        <button class="btn btn-primary" style="flex:1; border-radius:8px; font-size:12px;">开始作答</button>
+        <button class="btn btn-outline" style="border-radius:8px; font-size:12px; padding:8px 12px;">💡 提示</button>
+      </div>
+    </div>
+
+    <!-- Question Card 4 - completed -->
+    <div class="q-card low" style="opacity:0.7;">
+      <div style="display:flex; justify-content:space-between; align-items:center;">
+        <div>
+          <div style="display:flex; align-items:center; gap:6px; margin-bottom:4px;">
+            <span class="tag tag-green">已清零 ✓</span>
+            <span style="font-size:10px; color:#999;">概念理解 · 第1/10题</span>
+          </div>
+          <div style="font-size:12px; color:#666;">一次函数 y = kx + b 中，k > 0 时图像经过第___象限</div>
+        </div>
+        <div style="font-size:13px; font-weight:600; color:#27ae60;">满分</div>
+      </div>
+    </div>
+
+    <div class="q-card low" style="opacity:0.7;">
+      <div style="display:flex; justify-content:space-between; align-items:center;">
+        <div>
+          <div style="display:flex; align-items:center; gap:6px; margin-bottom:4px;">
+            <span class="tag tag-green">已清零 ✓</span>
+            <span style="font-size:10px; color:#999;">概念理解 · 第2/10题</span>
+          </div>
+          <div style="font-size:12px; color:#666;">若一次函数经过原点，则 b = ___，此时称函数为___函数</div>
+        </div>
+        <div style="font-size:13px; font-weight:600; color:#27ae60;">满分</div>
+      </div>
+    </div>
+
+    <div style="height:20px;"></div>
+  </div>
+
+  <div class="phone-tabbar">
+    <div class="tab-item"><div class="tab-icon">🏠</div><div>首页</div></div>
+    <div class="tab-item active"><div class="tab-icon">📚</div><div>错题</div></div>
+    <div class="tab-item"><div class="tab-icon">🎯</div><div>押题</div></div>
+    <div class="tab-item"><div class="tab-icon">📸</div><div>收集</div></div>
+    <div class="tab-item"><div class="tab-icon">👤</div><div>我的</div></div>
+  </div>
+</div>
+</div>
+
+<!-- ===================== PAGE 4: 学生端 - 押题与周测 ===================== -->
+<div class="page" id="page-s-quiz">
+<div style="text-align:center; margin-bottom:20px;">
+  <span class="page-label label-student">学生端 App</span>
+</div>
+<div class="phone-frame">
+  <div class="phone-scroll" style="background:#f5f6fa;">
+    <div style="padding:8px 16px; display:flex; justify-content:space-between; font-size:11px; color:#999;">
+      <span>17:44</span><span>WiFi | 86%</span>
+    </div>
+
+    <!-- Header -->
+    <div style="padding:8px 16px 12px; display:flex; align-items:center; gap:12px;">
+      <div style="font-size:20px;">←</div>
+      <div style="font-size:17px; font-weight:700; color:#1a1a2e;">押题与周测</div>
+    </div>
+
+    <!-- Hit Rate Summary -->
+    <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px; padding:0 12px; margin-bottom:12px;">
+      <div class="m-card" style="text-align:center; margin:0; padding:12px 8px; background:linear-gradient(135deg,#e74c3c,#c0392b); border:none; color:#fff;">
+        <div style="font-size:10px; opacity:0.8;">知识点圈定率</div>
+        <div style="font-size:24px; font-weight:700; margin-top:4px;">93%</div>
+        <div style="font-size:9px; opacity:0.7; margin-top:2px;">≥90%达标</div>
+      </div>
+      <div class="m-card" style="text-align:center; margin:0; padding:12px 8px; background:linear-gradient(135deg,#f39c12,#e67e22); border:none; color:#fff;">
+        <div style="font-size:10px; opacity:0.8;">相似题压中率</div>
+        <div style="font-size:24px; font-weight:700; margin-top:4px;">71%</div>
+        <div style="font-size:9px; opacity:0.7; margin-top:2px;">≥60%达标</div>
+      </div>
+      <div class="m-card" style="text-align:center; margin:0; padding:12px 8px; background:linear-gradient(135deg,#27ae60,#219a52); border:none; color:#fff;">
+        <div style="font-size:10px; opacity:0.8;">原题押中率</div>
+        <div style="font-size:24px; font-weight:700; margin-top:4px;">35%</div>
+        <div style="font-size:9px; opacity:0.7; margin-top:2px;">≥30%达标</div>
+      </div>
+    </div>
+
+    <!-- High Frequency Knowledge Points -->
+    <div class="m-section-title">期末高频知识点 Top 5</div>
+    <div class="m-subtitle">基于近3年本校试卷AI分析，以下知识点出现频率最高</div>
+
+    <div class="m-card" style="display:flex; align-items:center; gap:12px;">
+      <div style="width:28px; height:28px; border-radius:50%; background:linear-gradient(135deg,#e74c3c,#c0392b); color:#fff; display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:700; flex-shrink:0;">1</div>
+      <div style="flex:1;">
+        <div style="font-size:13px; font-weight:600;">一次函数图像与性质</div>
+        <div style="font-size:11px; color:#999;">数学 · 3年100%出现 · 平均占分14</div>
+      </div>
+      <div style="font-size:12px; font-weight:700; color:#e74c3c;">100%</div>
+    </div>
+
+    <div class="m-card" style="display:flex; align-items:center; gap:12px;">
+      <div style="width:28px; height:28px; border-radius:50%; background:linear-gradient(135deg,#f39c12,#e67e22); color:#fff; display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:700; flex-shrink:0;">2</div>
+      <div style="flex:1;">
+        <div style="font-size:13px; font-weight:600;">全等三角形证明</div>
+        <div style="font-size:11px; color:#999;">数学 · 3年100%出现 · 平均占分10</div>
+      </div>
+      <div style="font-size:12px; font-weight:700; color:#f39c12;">100%</div>
+    </div>
+
+    <div class="m-card" style="display:flex; align-items:center; gap:12px;">
+      <div style="width:28px; height:28px; border-radius:50%; background:linear-gradient(135deg,#f39c12,#e67e22); color:#fff; display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:700; flex-shrink:0;">3</div>
+      <div style="flex:1;">
+        <div style="font-size:13px; font-weight:600;">二元一次方程组</div>
+        <div style="font-size:11px; color:#999;">数学 · 3年100%出现 · 平均占分8</div>
+      </div>
+      <div style="font-size:12px; font-weight:700; color:#f39c12;">100%</div>
+    </div>
+
+    <div class="m-card" style="display:flex; align-items:center; gap:12px;">
+      <div style="width:28px; height:28px; border-radius:50%; background:linear-gradient(135deg,#4a90e2,#357abd); color:#fff; display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:700; flex-shrink:0;">4</div>
+      <div style="flex:1;">
+        <div style="font-size:13px; font-weight:600;">亚洲地理特征</div>
+        <div style="font-size:11px; color:#999;">地理 · 3年2次出现 · 平均占分6</div>
+      </div>
+      <div style="font-size:12px; font-weight:700; color:#4a90e2;">67%</div>
+    </div>
+
+    <div class="m-card" style="display:flex; align-items:center; gap:12px;">
+      <div style="width:28px; height:28px; border-radius:50%; background:linear-gradient(135deg,#4a90e2,#357abd); color:#fff; display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:700; flex-shrink:0;">5</div>
+      <div style="flex:1;">
+        <div style="font-size:13px; font-weight:600;">不等式组解集</div>
+        <div style="font-size:11px; color:#999;">数学 · 3年2次出现 · 平均占分6</div>
+      </div>
+      <div style="font-size:12px; font-weight:700; color:#4a90e2;">67%</div>
+    </div>
+
+    <!-- Quiz Entry -->
+    <div class="m-section-title">本周押题模拟</div>
+    <div class="m-card" style="background:linear-gradient(135deg,#e8f0fe,#f0e8fe); border:none; cursor:pointer;">
+      <div style="display:flex; justify-content:space-between; align-items:center;">
+        <div>
+          <div style="font-size:14px; font-weight:700; color:#1a1a2e;">数学押题模拟 · 第7周</div>
+          <div style="font-size:11px; color:#666; margin-top:4px;">涵盖一次函数、全等三角形、方程组</div>
+          <div style="display:flex; gap:8px; margin-top:8px;">
+            <span class="tag tag-blue">5道题</span>
+            <span class="tag tag-blue">30分钟</span>
+            <span class="tag tag-blue">AI预测高频</span>
+          </div>
+        </div>
+        <div style="font-size:28px;">🎯</div>
+      </div>
+    </div>
+
+    <div class="m-card" style="background:linear-gradient(135deg,#e8f8f0,#e8f0fe); border:none; cursor:pointer;">
+      <div style="display:flex; justify-content:space-between; align-items:center;">
+        <div>
+          <div style="font-size:14px; font-weight:700; color:#1a1a2e;">地理押题模拟 · 第7周</div>
+          <div style="font-size:11px; color:#666; margin-top:4px;">涵盖亚洲地理、气候类型、人口分布</div>
+          <div style="display:flex; gap:8px; margin-top:8px;">
+            <span class="tag tag-green">3道题</span>
+            <span class="tag tag-green">20分钟</span>
+            <span class="tag tag-green">本校真题改编</span>
+          </div>
+        </div>
+        <div style="font-size:28px;">🌍</div>
+      </div>
+    </div>
+
+    <!-- Go Do Prediction Paper Entry -->
+    <div class="m-card" style="background:linear-gradient(135deg,#e74c3c,#c0392b); border:none; cursor:pointer; padding:16px;">
+      <div style="display:flex; justify-content:space-between; align-items:center;">
+        <div style="display:flex; align-items:center; gap:12px;">
+          <div style="width:48px; height:48px; border-radius:12px; background:rgba(255,255,255,0.2); display:flex; align-items:center; justify-content:center; font-size:24px;">📝</div>
+          <div>
+            <div style="font-size:16px; font-weight:700; color:#fff;">去做预测卷</div>
+            <div style="font-size:11px; color:rgba(255,255,255,0.8); margin-top:4px;">AI根据本校历年真题智能生成期末模拟卷</div>
+            <div style="display:flex; gap:8px; margin-top:6px;">
+              <span style="font-size:10px; padding:2px 8px; border-radius:4px; background:rgba(255,255,255,0.2); color:#fff;">完整试卷</span>
+              <span style="font-size:10px; padding:2px 8px; border-radius:4px; background:rgba(255,255,255,0.2); color:#fff;">90分钟</span>
+              <span style="font-size:10px; padding:2px 8px; border-radius:4px; background:rgba(255,255,255,0.2); color:#fff;">AI批改</span>
+            </div>
+          </div>
+        </div>
+        <div style="width:36px; height:36px; border-radius:50%; background:rgba(255,255,255,0.25); display:flex; align-items:center; justify-content:center; font-size:18px; color:#fff;">→</div>
+      </div>
+      <div style="margin-top:10px; padding:8px 10px; background:rgba(255,255,255,0.1); border-radius:6px; font-size:11px; color:rgba(255,255,255,0.9);">
+        基于你学校的1,247份试卷数据 + 你个人的薄弱知识点，为你定制专属预测卷
+      </div>
+    </div>
+
+    <!-- Historical Hit Details -->
+    <div class="m-section-title">上月押题命中详情</div>
+    <div class="m-card">
+      <div style="font-size:12px; font-weight:600; color:#333; margin-bottom:10px;">4月月测押题报告</div>
+      <div style="display:flex; flex-direction:column; gap:8px;">
+        <div style="display:flex; justify-content:space-between; align-items:center; padding:8px; background:#e8f8f0; border-radius:6px;">
+          <div>
+            <div style="font-size:12px; font-weight:600;">第5题 · 全等三角形证明</div>
+            <div style="font-size:10px; color:#666;">押题第3题 · 题型完全一致</div>
+          </div>
+          <span class="tag tag-green">原题命中</span>
+        </div>
+        <div style="display:flex; justify-content:space-between; align-items:center; padding:8px; background:#fef3e2; border-radius:6px;">
+          <div>
+            <div style="font-size:12px; font-weight:600;">第12题 · 不等式组</div>
+            <div style="font-size:10px; color:#666;">押题第1题 · 知识点相同，数据不同</div>
+          </div>
+          <span class="tag tag-orange">相似命中</span>
+        </div>
+        <div style="display:flex; justify-content:space-between; align-items:center; padding:8px; background:#e8f0fe; border-radius:6px;">
+          <div>
+            <div style="font-size:12px; font-weight:600;">第18题 · 一次函数应用</div>
+            <div style="font-size:10px; color:#666;">押题覆盖一次函数考点</div>
+          </div>
+          <span class="tag tag-blue">知识点命中</span>
+        </div>
+        <div style="display:flex; justify-content:space-between; align-items:center; padding:8px; background:#e8f8f0; border-radius:6px;">
+          <div>
+            <div style="font-size:12px; font-weight:600;">第3题 · 因式分解</div>
+            <div style="font-size:10px; color:#666;">押题第4题 · 题型一致，数据相同</div>
+          </div>
+          <span class="tag tag-green">原题命中</span>
+        </div>
+      </div>
+    </div>
+
+    <div style="height:20px;"></div>
+  </div>
+
+  <div class="phone-tabbar">
+    <div class="tab-item"><div class="tab-icon">🏠</div><div>首页</div></div>
+    <div class="tab-item"><div class="tab-icon">📚</div><div>错题</div></div>
+    <div class="tab-item active"><div class="tab-icon">🎯</div><div>押题</div></div>
+    <div class="tab-item"><div class="tab-icon">📸</div><div>收集</div></div>
+    <div class="tab-item"><div class="tab-icon">👤</div><div>我的</div></div>
+  </div>
+</div>
+</div>
+
+<!-- ===================== PAGE 5: 学生端 - 试卷拍照收集 ===================== -->
+<div class="page" id="page-s-exam">
+<div style="text-align:center; margin-bottom:20px;">
+  <span class="page-label label-student">学生端 App</span>
+</div>
+<div class="phone-frame">
+  <div class="phone-scroll" style="background:#f5f6fa;">
+    <div style="padding:8px 16px; display:flex; justify-content:space-between; font-size:11px; color:#999;">
+      <span>18:26</span><span>WiFi | 72%</span>
+    </div>
+
+    <!-- Header -->
+    <div style="padding:8px 16px 12px; display:flex; align-items:center; gap:12px;">
+      <div style="font-size:20px;">←</div>
+      <div style="font-size:17px; font-weight:700; color:#1a1a2e;">试卷拍照收集</div>
+    </div>
+
+    <!-- Banner -->
+    <div class="m-card" style="background:linear-gradient(135deg,#667eea,#764ba2); color:#fff; border:none;">
+      <div style="display:flex; align-items:center; gap:10px;">
+        <div style="font-size:28px;">📸</div>
+        <div>
+          <div style="font-size:14px; font-weight:700;">收集试卷，赢取积分奖励</div>
+          <div style="font-size:11px; opacity:0.8; margin-top:2px;">拍照上传考试试卷，AI自动切题录入，每份试卷+20积分</div>
+        </div>
+      </div>
+      <div style="display:flex; gap:8px; margin-top:10px;">
+        <div style="flex:1; background:rgba(255,255,255,0.15); border-radius:6px; padding:6px 8px; font-size:10px; text-align:center;">
+          <div style="opacity:0.8;">本校已收集</div>
+          <div style="font-weight:700; font-size:16px;">1,247 份</div>
+        </div>
+        <div style="flex:1; background:rgba(255,255,255,0.15); border-radius:6px; padding:6px 8px; font-size:10px; text-align:center;">
+          <div style="opacity:0.8;">你的贡献</div>
+          <div style="font-weight:700; font-size:16px;">15 份</div>
+        </div>
+        <div style="flex:1; background:rgba(255,255,255,0.15); border-radius:6px; padding:6px 8px; font-size:10px; text-align:center;">
+          <div style="opacity:0.8;">本月积分</div>
+          <div style="font-weight:700; font-size:16px;">+180</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Camera Button -->
+    <div class="m-section-title">快速拍照</div>
+    <div style="padding:0 12px;">
+      <div style="background:#fff; border-radius:12px; padding:20px; text-align:center; border:2px dashed #4a90e2; cursor:pointer; margin-bottom:10px;">
+        <div style="width:64px; height:64px; border-radius:50%; background:#e8f0fe; display:flex; align-items:center; justify-content:center; margin:0 auto; font-size:28px;">📷</div>
+        <div style="font-size:15px; font-weight:700; color:#4a90e2; margin-top:10px;">拍照上传试卷</div>
+        <div style="font-size:11px; color:#999; margin-top:4px;">对准试卷拍摄，AI自动识别题型和题目</div>
+      </div>
+    </div>
+
+    <!-- Upload Steps Guide -->
+    <div class="m-section-title">上传流程</div>
+    <div class="m-card">
+      <div style="display:flex; align-items:center; gap:12px; margin-bottom:12px;">
+        <div style="width:28px; height:28px; border-radius:50%; background:#4a90e2; color:#fff; display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:700; flex-shrink:0;">1</div>
+        <div>
+          <div style="font-size:13px; font-weight:600;">选择考试类型</div>
+          <div style="font-size:11px; color:#666;">周考 / 月考 / 期中 / 期末 / 单元测试</div>
+        </div>
+      </div>
+      <div style="display:flex; align-items:center; gap:12px; margin-bottom:12px;">
+        <div style="width:28px; height:28px; border-radius:50%; background:#4a90e2; color:#fff; display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:700; flex-shrink:0;">2</div>
+        <div>
+          <div style="font-size:13px; font-weight:600;">选择科目 + 拍照</div>
+          <div style="font-size:11px; color:#666;">支持多页连续拍摄，系统自动拼接</div>
+        </div>
+      </div>
+      <div style="display:flex; align-items:center; gap:12px; margin-bottom:12px;">
+        <div style="width:28px; height:28px; border-radius:50%; background:#f39c12; color:#fff; display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:700; flex-shrink:0;">3</div>
+        <div>
+          <div style="font-size:13px; font-weight:600;">AI自动切题录入</div>
+          <div style="font-size:11px; color:#666;">OCR识别 + 智能切分 + 知识点标注</div>
+        </div>
+      </div>
+      <div style="display:flex; align-items:center; gap:12px;">
+        <div style="width:28px; height:28px; border-radius:50%; background:#27ae60; color:#fff; display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:700; flex-shrink:0;">4</div>
+        <div>
+          <div style="font-size:13px; font-weight:600;">人工确认 + 数据入库</div>
+          <div style="font-size:11px; color:#666;">你确认题目无误后，自动汇入错题清零和押题库</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- AI Processing Demo -->
+    <div class="m-section-title">AI处理中 · 4月月测数学</div>
+    <div class="m-card" style="border-left:3px solid #f39c12;">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+        <span style="font-size:13px; font-weight:600;">数学试卷 · 4页</span>
+        <span class="tag tag-orange">AI处理中 72%</span>
+      </div>
+      <div class="progress-bar" style="margin-bottom:10px;"><div class="progress-fill" style="width:72%; background:#f39c12;"></div></div>
+      <div style="display:flex; flex-direction:column; gap:6px; font-size:11px; color:#666;">
+        <div style="display:flex; align-items:center; gap:6px;">
+          <span style="color:#27ae60;">✓</span> 第1页 · 选择题（1-8题）已切分完成
+        </div>
+        <div style="display:flex; align-items:center; gap:6px;">
+          <span style="color:#27ae60;">✓</span> 第2页 · 填空题（9-12题）已切分完成
+        </div>
+        <div style="display:flex; align-items:center; gap:6px;">
+          <span style="color:#f39c12;">◎</span> 第3页 · 解答题（13-16题）正在识别...
+        </div>
+        <div style="display:flex; align-items:center; gap:6px;">
+          <span style="color:#ddd;">○</span> 第4页 · 解答题（17-20题）等待处理
+        </div>
+      </div>
+    </div>
+
+    <!-- Confirmed Entry Preview -->
+    <div class="m-section-title">已录入试卷</div>
+    <div class="m-subtitle">这些试卷的题目已汇入错题清零和押题推荐</div>
+
+    <div class="m-card" style="display:flex; gap:12px; align-items:flex-start;">
+      <div style="width:48px; height:48px; border-radius:8px; background:#e8f0fe; display:flex; align-items:center; justify-content:center; font-size:20px; flex-shrink:0;">📐</div>
+      <div style="flex:1;">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+          <span style="font-size:13px; font-weight:600;">4月月测 · 数学</span>
+          <span class="tag tag-green">已录入 ✓</span>
+        </div>
+        <div style="font-size:11px; color:#999; margin-top:4px;">录入20题 · 识别准确率98% · 4月12日</div>
+        <div style="display:flex; gap:4px; margin-top:6px;">
+          <span class="tag tag-blue">已入错题库5题</span>
+          <span class="tag tag-purple">已入押题库12题</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="m-card" style="display:flex; gap:12px; align-items:flex-start;">
+      <div style="width:48px; height:48px; border-radius:8px; background:#e8f8f0; display:flex; align-items:center; justify-content:center; font-size:20px; flex-shrink:0;">🌍</div>
+      <div style="flex:1;">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+          <span style="font-size:13px; font-weight:600;">4月周测 · 地理</span>
+          <span class="tag tag-green">已录入 ✓</span>
+        </div>
+        <div style="font-size:11px; color:#999; margin-top:4px;">录入8题 · 识别准确率100% · 4月10日</div>
+        <div style="display:flex; gap:4px; margin-top:6px;">
+          <span class="tag tag-blue">已入错题库2题</span>
+          <span class="tag tag-purple">已入押题库5题</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="m-card" style="display:flex; gap:12px; align-items:flex-start;">
+      <div style="width:48px; height:48px; border-radius:8px; background:#fde8e8; display:flex; align-items:center; justify-content:center; font-size:20px; flex-shrink:0;">📝</div>
+      <div style="flex:1;">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+          <span style="font-size:13px; font-weight:600;">3月周测 · 数学</span>
+          <span class="tag tag-green">已录入 ✓</span>
+        </div>
+        <div style="font-size:11px; color:#999; margin-top:4px;">录入15题 · 识别准确率97% · 3月28日</div>
+        <div style="display:flex; gap:4px; margin-top:6px;">
+          <span class="tag tag-blue">已入错题库4题</span>
+          <span class="tag tag-purple">已入押题库10题</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="m-card" style="display:flex; gap:12px; align-items:flex-start;">
+      <div style="width:48px; height:48px; border-radius:8px; background:#fef3e2; display:flex; align-items:center; justify-content:center; font-size:20px; flex-shrink:0;">🔤</div>
+      <div style="flex:1;">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+          <span style="font-size:13px; font-weight:600;">3月月测 · 英语</span>
+          <span class="tag tag-green">已录入 ✓</span>
+        </div>
+        <div style="font-size:11px; color:#999; margin-top:4px;">录入22题 · 识别准确率96% · 3月20日</div>
+        <div style="display:flex; gap:4px; margin-top:6px;">
+          <span class="tag tag-blue">已入错题库6题</span>
+          <span class="tag tag-purple">已入押题库15题</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- School Collection Stats -->
+    <div class="m-section-title">本校试卷库统计</div>
+    <div class="m-card">
+      <div style="font-size:12px; color:#999; margin-bottom:10px;">首都师大附中第一分校 · 试卷数据池</div>
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+        <div style="text-align:center; padding:10px; background:#f8f9fa; border-radius:8px;">
+          <div style="font-size:10px; color:#999;">数学试卷</div>
+          <div style="font-size:22px; font-weight:700; color:#4a90e2;">423份</div>
+          <div style="font-size:10px; color:#666;">覆盖2023-2026年</div>
+        </div>
+        <div style="text-align:center; padding:10px; background:#f8f9fa; border-radius:8px;">
+          <div style="font-size:10px; color:#999;">英语试卷</div>
+          <div style="font-size:22px; font-weight:700; color:#27ae60;">387份</div>
+          <div style="font-size:10px; color:#666;">覆盖2023-2026年</div>
+        </div>
+        <div style="text-align:center; padding:10px; background:#f8f9fa; border-radius:8px;">
+          <div style="font-size:10px; color:#999;">语文试卷</div>
+          <div style="font-size:22px; font-weight:700; color:#f39c12;">256份</div>
+          <div style="font-size:10px; color:#666;">覆盖2023-2026年</div>
+        </div>
+        <div style="text-align:center; padding:10px; background:#f8f9fa; border-radius:8px;">
+          <div style="font-size:10px; color:#999;">地理试卷</div>
+          <div style="font-size:22px; font-weight:700; color:#8e44ad;">181份</div>
+          <div style="font-size:10px; color:#666;">覆盖2023-2026年</div>
+        </div>
+      </div>
+      <div style="margin-top:10px; padding:8px; background:#e8f0fe; border-radius:6px; font-size:11px; color:#4a90e2; text-align:center;">
+        这些数据正在持续优化你的押题准确率！
+      </div>
+    </div>
+
+    <!-- Data Flow Explanation -->
+    <div class="m-section-title">数据如何被使用？</div>
+    <div class="m-card" style="background:#f8f9fa;">
+      <div style="display:flex; flex-direction:column; gap:10px;">
+        <div style="display:flex; gap:8px; align-items:flex-start;">
+          <span style="font-size:16px; flex-shrink:0;">📥</span>
+          <div>
+            <div style="font-size:12px; font-weight:600;">试卷拍照上传</div>
+            <div style="font-size:11px; color:#666; margin-top:2px;">你和同学拍照上传考试试卷</div>
+          </div>
+        </div>
+        <div style="text-align:center; color:#ccc;">↓</div>
+        <div style="display:flex; gap:8px; align-items:flex-start;">
+          <span style="font-size:16px; flex-shrink:0;">🤖</span>
+          <div>
+            <div style="font-size:12px; font-weight:600;">AI切题 + OCR录入</div>
+            <div style="font-size:11px; color:#666; margin-top:2px;">自动识别每道题、切分题目、标注知识点和难度</div>
+          </div>
+        </div>
+        <div style="text-align:center; color:#ccc;">↓</div>
+        <div style="display:flex; gap:8px; align-items:flex-start;">
+          <span style="font-size:16px; flex-shrink:0;">✅</span>
+          <div>
+            <div style="font-size:12px; font-weight:600;">人工确认修正</div>
+            <div style="font-size:11px; color:#666; margin-top:2px;">你/同学确认AI切分和识别结果无误</div>
+          </div>
+        </div>
+        <div style="text-align:center; color:#ccc;">↓</div>
+        <div style="display:flex; gap:8px; align-items:flex-start;">
+          <span style="font-size:16px; flex-shrink:0;">📚</span>
+          <div>
+            <div style="font-size:12px; font-weight:600;">汇入校级试卷数据库</div>
+            <div style="font-size:11px; color:#666; margin-top:2px;">题目进入本校试卷库，用于出题规律分析</div>
+          </div>
+        </div>
+        <div style="text-align:center; color:#ccc;">↓</div>
+        <div style="display:flex; gap:8px; align-items:flex-start;">
+          <span style="font-size:16px; flex-shrink:0;">🎯</span>
+          <div>
+            <div style="font-size:12px; font-weight:600; color:#e74c3c;">驱动错题清零 + 押题推荐</div>
+            <div style="font-size:11px; color:#666; margin-top:2px;">基于本校真实试卷数据，精准推荐你要练的题和期末可能考的题</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div style="height:20px;"></div>
+  </div>
+
+  <div class="phone-tabbar">
+    <div class="tab-item"><div class="tab-icon">🏠</div><div>首页</div></div>
+    <div class="tab-item"><div class="tab-icon">📚</div><div>错题</div></div>
+    <div class="tab-item"><div class="tab-icon">🎯</div><div>押题</div></div>
+    <div class="tab-item active"><div class="tab-icon">📸</div><div>收集</div></div>
+    <div class="tab-item"><div class="tab-icon">👤</div><div>我的</div></div>
+  </div>
+</div>
+</div>
+
+<!-- ===================== PAGE 6: 家长端 - 周学习报告 ===================== -->
+<div class="page" id="page-p-report">
+<div style="text-align:center; margin-bottom:20px;">
+  <span class="page-label label-parent">家长端小程序</span>
+</div>
+<div class="mini-phone">
+  <div class="mini-phone-scroll" style="background:#f5f6fa;">
+    <div style="padding:6px 16px; display:flex; justify-content:space-between; font-size:11px; color:#999;">
+      <span>17:44</span><span>WiFi</span>
+    </div>
+
+    <!-- Header -->
+    <div style="padding:8px 16px 12px;">
+      <div style="font-size:18px; font-weight:700; color:#1a1a2e;">小明本周学习报告</div>
+      <div style="font-size:12px; color:#999; margin-top:2px;">4月7日 - 4月11日 · 第7周</div>
+    </div>
+
+    <!-- Score Overview -->
+    <div class="m-card" style="text-align:center; background:linear-gradient(135deg,#4a90e2,#357abd); color:#fff; border:none;">
+      <div style="font-size:11px; opacity:0.8;">本周综合评分</div>
+      <div style="font-size:48px; font-weight:700; margin-top:4px;">86</div>
+      <div style="font-size:12px; opacity:0.7; margin-top:4px;">较上周 +8 分 ↑ 持续进步中！</div>
+      <div style="display:flex; justify-content:center; gap:24px; margin-top:12px;">
+        <div>
+          <div style="font-size:10px; opacity:0.7;">清零率</div>
+          <div style="font-size:20px; font-weight:700;">75%</div>
+        </div>
+        <div>
+          <div style="font-size:10px; opacity:0.7;">课堂参与</div>
+          <div style="font-size:20px; font-weight:700;">92%</div>
+        </div>
+        <div>
+          <div style="font-size:10px; opacity:0.7;">押中贡献</div>
+          <div style="font-size:20px; font-weight:700;">+6分</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Highlights -->
+    <div class="m-section-title">本周亮点</div>
+    <div class="m-card" style="display:flex; gap:8px; align-items:flex-start; border-left:3px solid #27ae60;">
+      <span style="font-size:16px; flex-shrink:0;">✅</span>
+      <div>
+        <div style="font-size:13px; font-weight:600;">全等三角形知识点清零完成</div>
+        <div style="font-size:11px; color:#666; margin-top:2px;">从掌握度42%提升至85%，连续4天正确率100%</div>
+      </div>
+    </div>
+
+    <div class="m-card" style="display:flex; gap:8px; align-items:flex-start; border-left:3px solid #27ae60;">
+      <span style="font-size:16px; flex-shrink:0;">✅</span>
+      <div>
+        <div style="font-size:13px; font-weight:600;">周测押题命中3道（共5道）</div>
+        <div style="font-size:11px; color:#666; margin-top:2px;">其中1道原题命中、2道相似命中，多拿6分</div>
+      </div>
+    </div>
+
+    <div class="m-card" style="display:flex; gap:8px; align-items:flex-start; border-left:3px solid #27ae60;">
+      <span style="font-size:16px; flex-shrink:0;">✅</span>
+      <div>
+        <div style="font-size:13px; font-weight:600;">直播课出勤率100%，随堂答题正确率88%</div>
+        <div style="font-size:11px; color:#666; margin-top:2px;">连续2周出勤率满分，课堂互动积极</div>
+      </div>
+    </div>
+
+    <!-- Needs Attention -->
+    <div class="m-section-title" style="color:#e74c3c;">需关注</div>
+    <div class="m-card" style="display:flex; gap:8px; align-items:flex-start; border-left:3px solid #e74c3c;">
+      <span style="font-size:16px; flex-shrink:0;">⚠️</span>
+      <div>
+        <div style="font-size:13px; font-weight:600;">一次函数图像变换仍有困难</div>
+        <div style="font-size:11px; color:#666; margin-top:2px;">本周练习10题，正确率仅55%。已加入紧急清零队列，AI已追加专项训练。</div>
+      </div>
+    </div>
+
+    <div class="m-card" style="display:flex; gap:8px; align-items:flex-start; border-left:3px solid #f39c12;">
+      <span style="font-size:16px; flex-shrink:0;">⏰</span>
+      <div>
+        <div style="font-size:13px; font-weight:600;">本周学习时长低于目标20%</div>
+        <div style="font-size:11px; color:#666; margin-top:2px;">本周累计3.2小时，目标4小时。建议增加每日15分钟错题巩固。</div>
+      </div>
+    </div>
+
+    <!-- Teacher Comment -->
+    <div class="m-section-title">辅导老师寄语</div>
+    <div class="m-card" style="background:#f8f9fa;">
+      <div style="display:flex; align-items:center; gap:8px; margin-bottom:8px;">
+        <div style="width:32px; height:32px; border-radius:50%; background:#8e44ad; color:#fff; display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:600;">张</div>
+        <div>
+          <div style="font-size:13px; font-weight:600;">张老师</div>
+          <div style="font-size:10px; color:#999;">升学辅导老师 · 4月11日</div>
+        </div>
+      </div>
+      <div style="font-size:12px; color:#555; line-height:1.8;">
+        小明本周整体表现不错！全等三角形和因式分解的清零效果很好，说明专项训练方法对他很有效。一次函数图像变换这个知识点需要额外关注，我下周会增加针对性的直播课讲解和课后练习。建议家长每天督促完成15分钟错题巩固任务，保持学习节奏。按目前进度，期末达到550分目标是有很大希望的！
+      </div>
+    </div>
+
+    <div style="height:20px;"></div>
+  </div>
+
+  <div class="mini-tabbar">
+    <div class="tab-item active" style="font-size:10px;"><div class="tab-icon" style="font-size:16px;">📊</div><div>报告</div></div>
+    <div class="tab-item" style="font-size:10px;"><div class="tab-icon" style="font-size:16px;">🎓</div><div>升学</div></div>
+    <div class="tab-item" style="font-size:10px;"><div class="tab-icon" style="font-size:16px;">💬</div><div>沟通</div></div>
+    <div class="tab-item" style="font-size:10px;"><div class="tab-icon" style="font-size:16px;">👤</div><div>我的</div></div>
+  </div>
+</div>
+</div>
+
+<!-- ===================== PAGE 7: 家长端 - 升学规划 ===================== -->
+<div class="page" id="page-p-plan">
+<div style="text-align:center; margin-bottom:20px;">
+  <span class="page-label label-parent">家长端小程序</span>
+</div>
+<div class="mini-phone">
+  <div class="mini-phone-scroll" style="background:#f5f6fa;">
+    <div style="padding:6px 16px; display:flex; justify-content:space-between; font-size:11px; color:#999;">
+      <span>17:44</span><span>WiFi</span>
+    </div>
+
+    <div style="padding:8px 16px 12px;">
+      <div style="font-size:18px; font-weight:700; color:#1a1a2e;">升学规划</div>
+      <div style="font-size:12px; color:#999; margin-top:2px;">基于AI分析 + 辅导老师评估</div>
+    </div>
+
+    <!-- Target School -->
+    <div class="m-card" style="background:linear-gradient(135deg,#1a1a2e,#2d2d5e); color:#fff; border:none;">
+      <div style="display:flex; justify-content:space-between; align-items:center;">
+        <div>
+          <div style="font-size:11px; opacity:0.7;">目标高中</div>
+          <div style="font-size:16px; font-weight:700; margin-top:4px;">首都师范大学附属中学</div>
+        </div>
+        <div style="padding:4px 10px; background:rgba(39,174,96,0.3); border-radius:12px; font-size:11px; color:#27ae60;">可冲刺</div>
+      </div>
+      <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px; margin-top:12px; padding-top:12px; border-top:1px solid rgba(255,255,255,0.1);">
+        <div style="text-align:center;">
+          <div style="font-size:10px; opacity:0.6;">录取线</div>
+          <div style="font-size:16px; font-weight:700;">546</div>
+        </div>
+        <div style="text-align:center;">
+          <div style="font-size:10px; opacity:0.6;">当前预估</div>
+          <div style="font-size:16px; font-weight:700; color:#f39c12;">524</div>
+        </div>
+        <div style="text-align:center;">
+          <div style="font-size:10px; opacity:0.6;">差距</div>
+          <div style="font-size:16px; font-weight:700; color:#e74c3c;">22分</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Gap Analysis -->
+    <div class="m-section-title">分科提分空间</div>
+    <div class="m-card">
+      <div style="display:flex; flex-direction:column; gap:10px;">
+        <div>
+          <div style="display:flex; justify-content:space-between; font-size:12px; margin-bottom:4px;">
+            <span style="font-weight:600;">数学</span>
+            <span style="color:#e74c3c;">可提 +12分</span>
+          </div>
+          <div class="progress-bar"><div class="progress-fill" style="width:62%; background:#e74c3c;"></div></div>
+          <div style="font-size:10px; color:#999; margin-top:2px;">当前82分 → 目标94分 · 薄弱点：函数、几何证明</div>
+        </div>
+        <div>
+          <div style="display:flex; justify-content:space-between; font-size:12px; margin-bottom:4px;">
+            <span style="font-weight:600;">英语</span>
+            <span style="color:#f39c12;">可提 +6分</span>
+          </div>
+          <div class="progress-bar"><div class="progress-fill" style="width:75%; background:#f39c12;"></div></div>
+          <div style="font-size:10px; color:#999; margin-top:2px;">当前75分 → 目标81分 · 薄弱点：完形填空、写作</div>
+        </div>
+        <div>
+          <div style="display:flex; justify-content:space-between; font-size:12px; margin-bottom:4px;">
+            <span style="font-weight:600;">语文</span>
+            <span style="color:#27ae60;">可提 +4分</span>
+          </div>
+          <div class="progress-bar"><div class="progress-fill" style="width:88%; background:#27ae60;"></div></div>
+          <div style="font-size:10px; color:#999; margin-top:2px;">当前88分 → 目标92分 · 薄弱点：阅读理解</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Path Comparison -->
+    <div class="m-section-title">升学路径对比</div>
+    <div class="m-card" style="border-left:3px solid #27ae60;">
+      <div style="display:flex; justify-content:space-between; align-items:center;">
+        <span style="font-size:14px; font-weight:600;">校额到校（推荐）</span>
+        <span class="tag tag-green">匹配95%</span>
+      </div>
+      <div style="font-size:11px; color:#666; margin-top:6px; line-height:1.6;">
+        校内排名前5%，参考近3年数据录取概率极高。需保持排名至5月审核。
+      </div>
+      <div style="margin-top:8px; display:flex; gap:6px; flex-wrap:wrap;">
+        <span class="tag tag-green">风险低</span>
+        <span class="tag tag-green">无需额外考试</span>
+      </div>
+    </div>
+
+    <div class="m-card" style="border-left:3px solid #4a90e2;">
+      <div style="display:flex; justify-content:space-between; align-items:center;">
+        <span style="font-size:14px; font-weight:600;">"1+3"项目</span>
+        <span class="tag tag-blue">匹配78%</span>
+      </div>
+      <div style="font-size:11px; color:#666; margin-top:6px; line-height:1.6;">
+        初二结束后直升高中。需综合评价A-以上，目前B+，有提升空间。
+      </div>
+      <div style="margin-top:8px; display:flex; gap:6px; flex-wrap:wrap;">
+        <span class="tag tag-blue">风险中</span>
+        <span class="tag tag-blue">报名截止5月15日</span>
+      </div>
+    </div>
+
+    <div class="m-card" style="border-left:3px solid #999;">
+      <div style="display:flex; justify-content:space-between; align-items:center;">
+        <span style="font-size:14px; font-weight:600;">统一招生</span>
+        <span class="tag" style="background:#f0f0f0; color:#999;">匹配62%</span>
+      </div>
+      <div style="font-size:11px; color:#666; margin-top:6px; line-height:1.6;">
+        需考到546分以上，当前524分，差距22分。按提分趋势可冲刺。
+      </div>
+      <div style="margin-top:8px; display:flex; gap:6px; flex-wrap:wrap;">
+        <span class="tag" style="background:#f0f0f0; color:#999;">风险高</span>
+        <span class="tag" style="background:#f0f0f0; color:#999;">成绩波动大</span>
+      </div>
+    </div>
+
+    <!-- Key Dates -->
+    <div class="m-section-title">关键时间节点</div>
+    <div class="m-card">
+      <div class="timeline">
+        <div class="timeline-item">
+          <div class="timeline-date">2026年4月15日</div>
+          <div class="timeline-title">期中考试</div>
+          <div class="timeline-desc">阶段性检验，预测总分540+则升学目标可达成</div>
+        </div>
+        <div class="timeline-item">
+          <div class="timeline-date">2026年5月15日</div>
+          <div class="timeline-title">"1+3"项目报名截止</div>
+          <div class="timeline-desc">如选择此路径，需在此前完成报名</div>
+        </div>
+        <div class="timeline-item">
+          <div class="timeline-date">2026年5月20日</div>
+          <div class="timeline-title">校额到校资格审核</div>
+          <div class="timeline-desc">校内排名确认，需保持当前排名</div>
+        </div>
+        <div class="timeline-item">
+          <div class="timeline-date">2026年6月22-24日</div>
+          <div class="timeline-title">期末考试（统考）</div>
+          <div class="timeline-desc">最终统考，目标550+</div>
+        </div>
+        <div class="timeline-item">
+          <div class="timeline-date">2026年7月初</div>
+          <div class="timeline-title">成绩公布 + 志愿填报</div>
+          <div class="timeline-desc">根据成绩选择最优路径填报</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Teacher Action Plan -->
+    <div class="m-section-title">辅导老师行动方案</div>
+    <div class="m-card">
+      <div style="display:flex; flex-direction:column; gap:8px; font-size:12px;">
+        <div style="display:flex; gap:6px; align-items:flex-start;">
+          <span style="color:#4a90e2; flex-shrink:0;">1.</span>
+          <span>每周增加2次数学专项训练（函数+几何），每次30分钟</span>
+        </div>
+        <div style="display:flex; gap:6px; align-items:flex-start;">
+          <span style="color:#4a90e2; flex-shrink:0;">2.</span>
+          <span>每2周进行1次押题模拟考试，追踪提分效果</span>
+        </div>
+        <div style="display:flex; gap:6px; align-items:flex-start;">
+          <span style="color:#4a90e2; flex-shrink:0;">3.</span>
+          <span>5月中旬前完成升学路径确认，协助准备相关材料</span>
+        </div>
+        <div style="display:flex; gap:6px; align-items:flex-start;">
+          <span style="color:#4a90e2; flex-shrink:0;">4.</span>
+          <span>每周与家长沟通学习进度和升学策略调整</span>
+        </div>
+      </div>
+    </div>
+
+    <div style="height:20px;"></div>
+  </div>
+
+  <div class="mini-tabbar">
+    <div class="tab-item" style="font-size:10px;"><div class="tab-icon" style="font-size:16px;">📊</div><div>报告</div></div>
+    <div class="tab-item active" style="font-size:10px;"><div class="tab-icon" style="font-size:16px;">🎓</div><div>升学</div></div>
+    <div class="tab-item" style="font-size:10px;"><div class="tab-icon" style="font-size:16px;">💬</div><div>沟通</div></div>
+    <div class="tab-item" style="font-size:10px;"><div class="tab-icon" style="font-size:16px;">👤</div><div>我的</div></div>
+  </div>
+</div>
+</div>
+
+<!-- ===================== PAGE 8: 辅导老师 - 工作台总览 ===================== -->
+<div class="page" id="page-t-dashboard">
+<div style="text-align:center; margin-bottom:20px;">
+  <span class="page-label label-teacher">辅导老师工作台</span>
+</div>
+<div class="desktop-frame">
+  <div class="desktop-header">
+    <div style="font-size:16px; font-weight:700;">一起爱学 · 辅导老师工作台</div>
+    <div style="margin-left:auto; display:flex; align-items:center; gap:16px;">
+      <div style="font-size:12px; opacity:0.7;">张老师 · 升学辅导组</div>
+      <div style="width:32px; height:32px; border-radius:50%; background:#8e44ad; display:flex; align-items:center; justify-content:center; color:#fff; font-size:12px; font-weight:600;">张</div>
+    </div>
+  </div>
+  <div style="display:flex; border-bottom:1px solid #eee;">
+    <div class="desktop-tab active" style="padding:14px 24px;">学生管理</div>
+    <div class="desktop-tab" style="padding:14px 24px;">押题管理</div>
+    <div class="desktop-tab" style="padding:14px 24px;">考试日历</div>
+    <div class="desktop-tab" style="padding:14px 24px;">数据报表</div>
+  </div>
+  <div class="desktop-body">
+    <!-- Stats Row -->
+    <div style="display:grid; grid-template-columns:repeat(4, 1fr); gap:16px; margin-bottom:24px;">
+      <div class="stat-card">
+        <div style="font-size:12px; opacity:0.8;">负责学生</div>
+        <div style="font-size:32px; font-weight:700; margin-top:4px;">48</div>
+        <div style="font-size:11px; opacity:0.7; margin-top:2px;">初一 32人 · 初二 16人</div>
+      </div>
+      <div class="stat-card green">
+        <div style="font-size:12px; opacity:0.8;">本周活跃率</div>
+        <div style="font-size:32px; font-weight:700; margin-top:4px;">91%</div>
+        <div style="font-size:11px; opacity:0.7; margin-top:2px;">44/48人完成每日任务</div>
+      </div>
+      <div class="stat-card orange">
+        <div style="font-size:12px; opacity:0.8;">需关注学生</div>
+        <div style="font-size:32px; font-weight:700; margin-top:4px;">6</div>
+        <div style="font-size:11px; opacity:0.7; margin-top:2px;">3人成绩下滑 · 3人进度落后</div>
+      </div>
+      <div class="stat-card purple">
+        <div style="font-size:12px; opacity:0.8;">本月押中率</div>
+        <div style="font-size:32px; font-weight:700; margin-top:4px;">73%</div>
+        <div style="font-size:11px; opacity:0.7; margin-top:2px;">原题35% · 相似71% · 圈定93%</div>
+      </div>
+    </div>
+
+    <!-- AI Alerts -->
+    <div style="display:grid; grid-template-columns:2fr 1fr; gap:16px; margin-bottom:24px;">
+      <div class="card">
+        <div style="font-size:14px; font-weight:700; margin-bottom:12px; display:flex; align-items:center; gap:8px;">
+          <span style="background:#e74c3c; color:#fff; padding:2px 8px; border-radius:4px; font-size:11px;">AI预警</span>
+          需要关注的学生
+        </div>
+        <div style="display:flex; flex-direction:column; gap:8px;">
+          <div style="display:flex; align-items:center; gap:12px; padding:10px; background:#fde8e8; border-radius:8px;">
+            <div style="width:36px; height:36px; border-radius:50%; background:#e74c3c; color:#fff; display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:600;">刘</div>
+            <div style="flex:1;">
+              <div style="font-size:13px; font-weight:600;">刘小芳 · 初一(3)班</div>
+              <div style="font-size:11px; color:#666;">连续3天未完成错题任务，周测成绩下降12分</div>
+            </div>
+            <div style="display:flex; gap:6px;">
+              <button class="btn btn-primary btn-sm">联系</button>
+              <button class="btn btn-sm" style="background:#f0f0f0;">查看详情</button>
+            </div>
+          </div>
+          <div style="display:flex; align-items:center; gap:12px; padding:10px; background:#fef3e2; border-radius:8px;">
+            <div style="width:36px; height:36px; border-radius:50%; background:#f39c12; color:#fff; display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:600;">陈</div>
+            <div style="flex:1;">
+              <div style="font-size:13px; font-weight:600;">陈浩宇 · 初一(5)班</div>
+              <div style="font-size:11px; color:#666;">英语完形填空连续2周正确率低于50%</div>
+            </div>
+            <div style="display:flex; gap:6px;">
+              <button class="btn btn-primary btn-sm">联系</button>
+              <button class="btn btn-sm" style="background:#f0f0f0;">查看详情</button>
+            </div>
+          </div>
+          <div style="display:flex; align-items:center; gap:12px; padding:10px; background:#fef3e2; border-radius:8px;">
+            <div style="width:36px; height:36px; border-radius:50%; background:#f39c12; color:#fff; display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:600;">王</div>
+            <div style="flex:1;">
+              <div style="font-size:13px; font-weight:600;">王欣然 · 初二(1)班</div>
+              <div style="font-size:11px; color:#666;">校内排名从第8名下滑至第15名，校额到校名额可能受影响</div>
+            </div>
+            <div style="display:flex; gap:6px;">
+              <button class="btn btn-primary btn-sm">联系</button>
+              <button class="btn btn-sm" style="background:#f0f0f0;">查看详情</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div style="font-size:14px; font-weight:700; margin-bottom:12px;">考试日历</div>
+        <div style="display:flex; flex-direction:column; gap:8px;">
+          <div style="padding:10px; background:#f8f9fa; border-radius:8px; border-left:3px solid #e74c3c;">
+            <div style="font-size:12px; font-weight:600;">4月15日 · 期中考试</div>
+            <div style="font-size:11px; color:#666; margin-top:2px;">全科统考 · 3天后</div>
+          </div>
+          <div style="padding:10px; background:#f8f9fa; border-radius:8px; border-left:3px solid #f39c12;">
+            <div style="font-size:12px; font-weight:600;">4月18日 · 周测（数学+英语）</div>
+            <div style="font-size:11px; color:#666; margin-top:2px;">本校出题 · 6天后</div>
+          </div>
+          <div style="padding:10px; background:#f8f9fa; border-radius:8px; border-left:3px solid #4a90e2;">
+            <div style="font-size:12px; font-weight:600;">5月15日 · "1+3"报名截止</div>
+            <div style="font-size:11px; color:#666; margin-top:2px;">升学 · 33天后</div>
+          </div>
+          <div style="padding:10px; background:#f8f9fa; border-radius:8px; border-left:3px solid #8e44ad;">
+            <div style="font-size:12px; font-weight:600;">6月22日 · 期末考试</div>
+            <div style="font-size:11px; color:#666; margin-top:2px;">全科统考 · 71天后</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Student List -->
+    <div class="card">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+        <div style="font-size:14px; font-weight:700;">学生列表</div>
+        <div style="display:flex; gap:8px;">
+          <select style="padding:6px 12px; border:1px solid #ddd; border-radius:6px; font-size:12px;">
+            <option>全部年级</option>
+            <option>初一</option>
+            <option>初二</option>
+          </select>
+          <select style="padding:6px 12px; border:1px solid #ddd; border-radius:6px; font-size:12px;">
+            <option>排序：需关注优先</option>
+            <option>排序：成绩升序</option>
+            <option>排序：活跃度</option>
+          </select>
+        </div>
+      </div>
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>学生</th>
+            <th>年级/班级</th>
+            <th>校内排名</th>
+            <th>预测分</th>
+            <th>清零率</th>
+            <th>本周状态</th>
+            <th>操作</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td style="font-weight:600;">小明</td>
+            <td>初一(3)班</td>
+            <td>12/240</td>
+            <td style="color:#27ae60; font-weight:600;">524</td>
+            <td>
+              <div style="display:flex; align-items:center; gap:6px;">
+                <div class="progress-bar" style="width:60px;"><div class="progress-fill" style="width:68%; background:#27ae60;"></div></div>
+                <span style="font-size:11px;">68%</span>
+              </div>
+            </td>
+            <td><span class="tag tag-green">正常</span></td>
+            <td><button class="btn btn-primary btn-sm">详情</button></td>
+          </tr>
+          <tr>
+            <td style="font-weight:600; color:#e74c3c;">刘小芳</td>
+            <td>初一(3)班</td>
+            <td>45/240</td>
+            <td style="color:#f39c12; font-weight:600;">472</td>
+            <td>
+              <div style="display:flex; align-items:center; gap:6px;">
+                <div class="progress-bar" style="width:60px;"><div class="progress-fill" style="width:35%; background:#e74c3c;"></div></div>
+                <span style="font-size:11px;">35%</span>
+              </div>
+            </td>
+            <td><span class="tag tag-red">⚠ 预警</span></td>
+            <td><button class="btn btn-primary btn-sm">详情</button></td>
+          </tr>
+          <tr>
+            <td style="font-weight:600;">陈浩宇</td>
+            <td>初一(5)班</td>
+            <td>28/230</td>
+            <td style="color:#27ae60; font-weight:600;">501</td>
+            <td>
+              <div style="display:flex; align-items:center; gap:6px;">
+                <div class="progress-bar" style="width:60px;"><div class="progress-fill" style="width:55%; background:#f39c12;"></div></div>
+                <span style="font-size:11px;">55%</span>
+              </div>
+            </td>
+            <td><span class="tag tag-orange">关注</span></td>
+            <td><button class="btn btn-primary btn-sm">详情</button></td>
+          </tr>
+          <tr>
+            <td style="font-weight:600;">赵雨萱</td>
+            <td>初一(3)班</td>
+            <td>8/240</td>
+            <td style="color:#27ae60; font-weight:600;">542</td>
+            <td>
+              <div style="display:flex; align-items:center; gap:6px;">
+                <div class="progress-bar" style="width:60px;"><div class="progress-fill" style="width:88%; background:#27ae60;"></div></div>
+                <span style="font-size:11px;">88%</span>
+              </div>
+            </td>
+            <td><span class="tag tag-green">优秀</span></td>
+            <td><button class="btn btn-primary btn-sm">详情</button></td>
+          </tr>
+          <tr>
+            <td style="font-weight:600; color:#e74c3c;">王欣然</td>
+            <td>初二(1)班</td>
+            <td>15/220</td>
+            <td style="color:#f39c12; font-weight:600;">498</td>
+            <td>
+              <div style="display:flex; align-items:center; gap:6px;">
+                <div class="progress-bar" style="width:60px;"><div class="progress-fill" style="width:42%; background:#e74c3c;"></div></div>
+                <span style="font-size:11px;">42%</span>
+              </div>
+            </td>
+            <td><span class="tag tag-red">⚠ 预警</span></td>
+            <td><button class="btn btn-primary btn-sm">详情</button></td>
+          </tr>
+        </tbody>
+      </table>
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-top:12px; font-size:12px; color:#999;">
+        <span>显示 1-5 / 共 48 名学生</span>
+        <div style="display:flex; gap:4px;">
+          <button class="btn btn-sm" style="background:#4a90e2; color:#fff;">1</button>
+          <button class="btn btn-sm" style="background:#f0f0f0;">2</button>
+          <button class="btn btn-sm" style="background:#f0f0f0;">3</button>
+          <button class="btn btn-sm" style="background:#f0f0f0;">...</button>
+          <button class="btn btn-sm" style="background:#f0f0f0;">10</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- ===================== PAGE 9: 辅导老师 - 学生详情 ===================== -->
+<div class="page" id="page-t-student">
+<div style="text-align:center; margin-bottom:20px;">
+  <span class="page-label label-teacher">辅导老师工作台</span>
+</div>
+<div class="desktop-frame">
+  <div class="desktop-header">
+    <div style="font-size:14px; opacity:0.7;">← 返回学生列表</div>
+    <div style="font-size:16px; font-weight:700; margin-left:16px;">学生详情 · 小明</div>
+    <div style="margin-left:auto; display:flex; gap:8px;">
+      <button class="btn btn-primary btn-sm">联系家长</button>
+      <button class="btn btn-sm" style="background:rgba(255,255,255,0.15); color:#fff;">导出报告</button>
+    </div>
+  </div>
+  <div class="desktop-body">
+    <!-- Student Profile -->
+    <div style="display:grid; grid-template-columns:1fr 2fr; gap:20px; margin-bottom:20px;">
+      <div class="card" style="text-align:center;">
+        <div style="width:64px; height:64px; border-radius:50%; background:linear-gradient(135deg,#4a90e2,#8e44ad); display:flex; align-items:center; justify-content:center; margin:0 auto; color:#fff; font-size:24px; font-weight:700;">明</div>
+        <div style="font-size:18px; font-weight:700; margin-top:12px;">小明</div>
+        <div style="font-size:12px; color:#999; margin-top:4px;">首都师大附中第一分校 · 初一(3)班</div>
+        <div style="font-size:12px; color:#999;">学号：2025030128 · 家长：明妈妈</div>
+        <div style="margin-top:12px; display:flex; justify-content:center; gap:8px;">
+          <span class="tag tag-green">校内排名 12/240</span>
+          <span class="tag tag-blue">目标：首师大附中</span>
+        </div>
+      </div>
+
+      <div style="display:flex; flex-direction:column; gap:12px;">
+        <div style="display:grid; grid-template-columns:repeat(4, 1fr); gap:12px;">
+          <div style="text-align:center; padding:12px; background:#f8f9fa; border-radius:8px;">
+            <div style="font-size:11px; color:#999;">预测总分</div>
+            <div style="font-size:24px; font-weight:700; color:#4a90e2;">524</div>
+          </div>
+          <div style="text-align:center; padding:12px; background:#f8f9fa; border-radius:8px;">
+            <div style="font-size:11px; color:#999;">清零率</div>
+            <div style="font-size:24px; font-weight:700; color:#27ae60;">68%</div>
+          </div>
+          <div style="text-align:center; padding:12px; background:#f8f9fa; border-radius:8px;">
+            <div style="font-size:11px; color:#999;">本周押中</div>
+            <div style="font-size:24px; font-weight:700; color:#f39c12;">5/7</div>
+          </div>
+          <div style="text-align:center; padding:12px; background:#f8f9fa; border-radius:8px;">
+            <div style="font-size:11px; color:#999;">提分速度</div>
+            <div style="font-size:24px; font-weight:700; color:#8e44ad;">+6/月</div>
+          </div>
+        </div>
+
+        <!-- AI Suggestion -->
+        <div style="padding:12px; background:linear-gradient(135deg,#fef9e7,#fdebd0); border-radius:8px; border:1px solid #f9e79f;">
+          <div style="font-size:12px; font-weight:700; color:#d4ac0d; margin-bottom:6px;">🤖 AI辅导建议</div>
+          <div style="font-size:12px; color:#7d6608; line-height:1.6;">
+            小明近期在"一次函数"知识点提升明显（从38%到55%），但"图像变换"仍为薄弱点（30%掌握度）。建议本周安排1次专项直播课 + 每日5道变式训练。根据期末考试预测模型，一次函数占分约14分，若能在6月前清零，总分可提升至530+。
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Knowledge Radar & Clear Trend -->
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:20px; margin-bottom:20px;">
+      <div class="card">
+        <div style="font-size:14px; font-weight:700; margin-bottom:12px;">知识掌握雷达图</div>
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">
+          <div style="display:flex; justify-content:space-between; align-items:center; padding:8px; background:#f8f9fa; border-radius:6px;">
+            <span style="font-size:12px;">一次函数</span>
+            <div style="display:flex; align-items:center; gap:6px;">
+              <div class="progress-bar" style="width:80px;"><div class="progress-fill" style="width:55%; background:#e74c3c;"></div></div>
+              <span style="font-size:11px; color:#e74c3c;">55%</span>
+            </div>
+          </div>
+          <div style="display:flex; justify-content:space-between; align-items:center; padding:8px; background:#f8f9fa; border-radius:6px;">
+            <span style="font-size:12px;">全等三角形</span>
+            <div style="display:flex; align-items:center; gap:6px;">
+              <div class="progress-bar" style="width:80px;"><div class="progress-fill" style="width:85%; background:#27ae60;"></div></div>
+              <span style="font-size:11px; color:#27ae60;">85%</span>
+            </div>
+          </div>
+          <div style="display:flex; justify-content:space-between; align-items:center; padding:8px; background:#f8f9fa; border-radius:6px;">
+            <span style="font-size:12px;">因式分解</span>
+            <div style="display:flex; align-items:center; gap:6px;">
+              <div class="progress-bar" style="width:80px;"><div class="progress-fill" style="width:72%; background:#f39c12;"></div></div>
+              <span style="font-size:11px; color:#f39c12;">72%</span>
+            </div>
+          </div>
+          <div style="display:flex; justify-content:space-between; align-items:center; padding:8px; background:#f8f9fa; border-radius:6px;">
+            <span style="font-size:12px;">不等式组</span>
+            <div style="display:flex; align-items:center; gap:6px;">
+              <div class="progress-bar" style="width:80px;"><div class="progress-fill" style="width:65%; background:#f39c12;"></div></div>
+              <span style="font-size:11px; color:#f39c12;">65%</span>
+            </div>
+          </div>
+          <div style="display:flex; justify-content:space-between; align-items:center; padding:8px; background:#f8f9fa; border-radius:6px;">
+            <span style="font-size:12px;">方程组</span>
+            <div style="display:flex; align-items:center; gap:6px;">
+              <div class="progress-bar" style="width:80px;"><div class="progress-fill" style="width:78%; background:#27ae60;"></div></div>
+              <span style="font-size:11px; color:#27ae60;">78%</span>
+            </div>
+          </div>
+          <div style="display:flex; justify-content:space-between; align-items:center; padding:8px; background:#f8f9fa; border-radius:6px;">
+            <span style="font-size:12px;">亚洲地理</span>
+            <div style="display:flex; align-items:center; gap:6px;">
+              <div class="progress-bar" style="width:80px;"><div class="progress-fill" style="width:55%; background:#e74c3c;"></div></div>
+              <span style="font-size:11px; color:#e74c3c;">55%</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div style="font-size:14px; font-weight:700; margin-bottom:12px;">清零趋势（近4周）</div>
+        <div style="display:flex; align-items:flex-end; gap:16px; height:160px; padding:0 12px;">
+          <div style="flex:1; text-align:center;">
+            <div style="font-size:20px; font-weight:700; color:#4a90e2;">42%</div>
+            <div style="height:100px; background:#e8f0fe; border-radius:6px 6px 0 0; margin-top:8px;"></div>
+            <div style="font-size:10px; color:#999; margin-top:4px;">第4周</div>
+          </div>
+          <div style="flex:1; text-align:center;">
+            <div style="font-size:20px; font-weight:700; color:#4a90e2;">51%</div>
+            <div style="height:120px; background:#d4e6f1; border-radius:6px 6px 0 0; margin-top:8px;"></div>
+            <div style="font-size:10px; color:#999; margin-top:4px;">第5周</div>
+          </div>
+          <div style="flex:1; text-align:center;">
+            <div style="font-size:20px; font-weight:700; color:#4a90e2;">60%</div>
+            <div style="height:140px; background:#a9cce3; border-radius:6px 6px 0 0; margin-top:8px;"></div>
+            <div style="font-size:10px; color:#999; margin-top:4px;">第6周</div>
+          </div>
+          <div style="flex:1; text-align:center;">
+            <div style="font-size:20px; font-weight:700; color:#27ae60;">68%</div>
+            <div style="height:150px; background:linear-gradient(to top,#27ae60,#2ecc71); border-radius:6px 6px 0 0; margin-top:8px;"></div>
+            <div style="font-size:10px; color:#27ae60; margin-top:4px; font-weight:600;">第7周</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Weakness & Communication -->
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:20px;">
+      <div class="card">
+        <div style="font-size:14px; font-weight:700; margin-bottom:12px;">薄弱知识点清单</div>
+        <div style="display:flex; flex-direction:column; gap:8px;">
+          <div style="display:flex; align-items:center; gap:8px; padding:8px; background:#fde8e8; border-radius:6px;">
+            <span class="tag tag-red">紧急</span>
+            <span style="font-size:12px; flex:1;">一次函数 · 图像变换</span>
+            <span style="font-size:11px; color:#e74c3c;">掌握度30%</span>
+          </div>
+          <div style="display:flex; align-items:center; gap:8px; padding:8px; background:#fde8e8; border-radius:6px;">
+            <span class="tag tag-red">紧急</span>
+            <span style="font-size:12px; flex:1;">一次函数 · 待定系数法</span>
+            <span style="font-size:11px; color:#e74c3c;">掌握度38%</span>
+          </div>
+          <div style="display:flex; align-items:center; gap:8px; padding:8px; background:#fef3e2; border-radius:6px;">
+            <span class="tag tag-orange">重要</span>
+            <span style="font-size:12px; flex:1;">亚洲地理特征</span>
+            <span style="font-size:11px; color:#f39c12;">掌握度55%</span>
+          </div>
+          <div style="display:flex; align-items:center; gap:8px; padding:8px; background:#fef3e2; border-radius:6px;">
+            <span class="tag tag-orange">重要</span>
+            <span style="font-size:12px; flex:1;">英语 · 完形填空</span>
+            <span style="font-size:11px; color:#f39c12;">掌握度60%</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div style="font-size:14px; font-weight:700; margin-bottom:12px;">沟通记录</div>
+        <div style="display:flex; flex-direction:column; gap:8px;">
+          <div style="padding:8px; background:#f8f9fa; border-radius:6px;">
+            <div style="display:flex; justify-content:space-between; font-size:11px; color:#999;">
+              <span>4月11日 · 与家长通话</span><span>12分钟</span>
+            </div>
+            <div style="font-size:12px; margin-top:4px; line-height:1.5;">沟通本周学习情况，建议家长督促每日错题巩固。家长表示配合，会每天检查任务完成情况。</div>
+          </div>
+          <div style="padding:8px; background:#f8f9fa; border-radius:6px;">
+            <div style="display:flex; justify-content:space-between; font-size:11px; color:#999;">
+              <span>4月8日 · 与学生在线沟通</span><span>5分钟</span>
+            </div>
+            <div style="font-size:12px; margin-top:4px; line-height:1.5;">学生反映函数图像变换理解有困难，已安排专项直播课补充讲解。</div>
+          </div>
+          <div style="padding:8px; background:#f8f9fa; border-radius:6px;">
+            <div style="display:flex; justify-content:space-between; font-size:11px; color:#999;">
+              <span>4月4日 · 周报发送</span><span>自动</span>
+            </div>
+            <div style="font-size:12px; margin-top:4px; line-height:1.5;">系统自动发送第6周学习报告至家长微信，家长已查看。</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- ===================== PAGE 10: 核心交互 - 推荐可溯源 ===================== -->
+<div class="page" id="page-core-trace">
+<div style="text-align:center; margin-bottom:20px;">
+  <span class="page-label label-core">核心交互页面</span>
+</div>
+<div style="max-width:800px; margin:0 auto;">
+  <div class="card" style="padding:24px;">
+    <div style="text-align:center; margin-bottom:24px;">
+      <div style="font-size:20px; font-weight:700; color:#1a1a2e;">AI推荐可溯源 · 完整溯源链</div>
+      <div style="font-size:13px; color:#666; margin-top:4px;">每一道推荐题目都有完整的来源追踪，让学习有据可依</div>
+    </div>
+
+    <!-- The Question -->
+    <div style="background:#f8f9fa; border-radius:10px; padding:16px; border:1px solid #e8e8e8; margin-bottom:20px;">
+      <div style="display:flex; align-items:center; gap:8px; margin-bottom:8px;">
+        <span class="tag tag-red">紧急</span>
+        <span style="font-size:13px; font-weight:700; color:#1a1a2e;">推荐题目</span>
+      </div>
+      <div style="font-size:14px; line-height:1.8; color:#333;">
+        已知一次函数 y = kx + b 的图像过点 A(2, 5) 和点 B(-1, -1)。<br>
+        (1) 求该函数的解析式；<br>
+        (2) 判断点 C(3, 7) 是否在该函数图像上，并说明理由；<br>
+        (3) 求该函数图像与 x 轴、y 轴的交点坐标。
+      </div>
+    </div>
+
+    <!-- Source Chain -->
+    <div style="margin-bottom:16px;">
+      <div style="font-size:14px; font-weight:700; color:#1a1a2e; margin-bottom:16px; display:flex; align-items:center; gap:8px;">
+        🔗 完整溯源链
+      </div>
+
+      <!-- Source 1: Error Record -->
+      <div style="display:flex; gap:16px; margin-bottom:16px;">
+        <div style="display:flex; flex-direction:column; align-items:center; flex-shrink:0;">
+          <div style="width:40px; height:40px; border-radius:50%; background:#e74c3c; color:#fff; display:flex; align-items:center; justify-content:center; font-size:18px; flex-shrink:0;">1</div>
+          <div style="width:2px; flex:1; background:#e74c3c; min-height:20px;"></div>
+        </div>
+        <div style="flex:1; background:#fde8e8; border-radius:10px; padding:16px; border:1px solid #f5c6cb;">
+          <div style="font-size:13px; font-weight:700; color:#e74c3c; margin-bottom:8px;">📍 来源一：周测错题记录</div>
+          <div style="font-size:12px; color:#666; line-height:1.8;">
+            <b>时间：</b>2026年3月28日 周测第3题<br>
+            <b>原题：</b>已知一次函数 y = kx + b 过点(1, 3)和(3, 7)，求k和b<br>
+            <b>你的答案：</b>C（k=1, b=2）<br>
+            <b>正确答案：</b>B（k=2, b=1）<br>
+            <b>错误分析：</b>代入计算时b值计算错误，将 3 = k + b 中的b误算为2
+          </div>
+        </div>
+      </div>
+
+      <!-- Source 2: Smart Pen -->
+      <div style="display:flex; gap:16px; margin-bottom:16px;">
+        <div style="display:flex; flex-direction:column; align-items:center; flex-shrink:0;">
+          <div style="width:40px; height:40px; border-radius:50%; background:#f39c12; color:#fff; display:flex; align-items:center; justify-content:center; font-size:18px; flex-shrink:0;">2</div>
+          <div style="width:2px; flex:1; background:#f39c12; min-height:20px;"></div>
+        </div>
+        <div style="flex:1; background:#fef3e2; border-radius:10px; padding:16px; border:1px solid #fdebd0;">
+          <div style="font-size:13px; font-weight:700; color:#f39c12; margin-bottom:8px;">✏️ 来源二：智慧笔行为数据</div>
+          <div style="font-size:12px; color:#666; line-height:1.8;">
+            <b>时间：</b>2026年4月2日 课堂练习<br>
+            <b>行为：</b>在"待定系数法求解析式"这一题第2步（代入消元）停留 <b style="color:#f39c12;">3分12秒</b><br>
+            <b>班级平均：</b>1分30秒<br>
+            <b>行为标记：</b>犹豫停顿（超班级平均2倍以上）、擦除重写2次<br>
+            <b>结论：</b>对该计算步骤不熟练，存在思维卡顿
+          </div>
+        </div>
+      </div>
+
+      <!-- Source 3: Exam Prediction -->
+      <div style="display:flex; gap:16px; margin-bottom:16px;">
+        <div style="display:flex; flex-direction:column; align-items:center; flex-shrink:0;">
+          <div style="width:40px; height:40px; border-radius:50%; background:#4a90e2; color:#fff; display:flex; align-items:center; justify-content:center; font-size:18px; flex-shrink:0;">3</div>
+          <div style="width:2px; flex:1; background:#4a90e2; min-height:20px;"></div>
+        </div>
+        <div style="flex:1; background:#e8f0fe; border-radius:10px; padding:16px; border:1px solid #a9cce3;">
+          <div style="font-size:13px; font-weight:700; color:#4a90e2; margin-bottom:8px;">🎯 来源三：校级考试预测数据库</div>
+          <div style="font-size:12px; color:#666; line-height:1.8;">
+            <b>学校：</b>首都师大附中第一分校<br>
+            <b>数据来源：</b>近3年（2023-2025）期末试卷分析<br>
+            <b>出现频率：</b>"待定系数法求一次函数解析式"在3年期末试卷中 <b style="color:#4a90e2;">100%出现</b><br>
+            <b>出题形式：</b>选择题1道（3-4分）+ 解答题1道（6-8分），合计约10分<br>
+            <b>2025年期末：</b>第8题（选择题4分）+ 第19题（解答题8分）<br>
+            <b>2024年期末：</b>第7题（选择题3分）+ 第20题（解答题8分）
+          </div>
+        </div>
+      </div>
+
+      <!-- Source 4: AI Conclusion -->
+      <div style="display:flex; gap:16px;">
+        <div style="display:flex; flex-direction:column; align-items:center; flex-shrink:0;">
+          <div style="width:40px; height:40px; border-radius:50%; background:#27ae60; color:#fff; display:flex; align-items:center; justify-content:center; font-size:18px; flex-shrink:0;">✓</div>
+        </div>
+        <div style="flex:1; background:linear-gradient(135deg,#e8f8f0,#d5f5e3); border-radius:10px; padding:16px; border:1px solid #abebc6;">
+          <div style="font-size:13px; font-weight:700; color:#27ae60; margin-bottom:8px;">🤖 AI综合推荐结论</div>
+          <div style="font-size:12px; color:#666; line-height:1.8;">
+            综合3个来源数据，AI推荐此题的理由：<br>
+            <b>① 你做错过同类题</b>（周测第3题待定系数法计算错误）；<br>
+            <b>② 你对此步骤犹豫</b>（智慧笔数据：停留时间超班级平均2倍）；<br>
+            <b>③ 期末必考此知识点</b>（近3年100%出现，占分约10分）。<br>
+            <b>推荐优先级：</b><span class="tag tag-red">紧急</span> <b>考试出现概率：92%</b><br>
+            <b>预期效果：</b>完成此题及后续变式训练后，掌握度可从38%提升至75%+
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- ===================== PAGE 11: 核心交互 - 押题效果报告 ===================== -->
+<div class="page" id="page-core-quiz">
+<div style="text-align:center; margin-bottom:20px;">
+  <span class="page-label label-core">核心交互页面</span>
+</div>
+<div style="max-width:900px; margin:0 auto;">
+  <div class="card" style="padding:24px;">
+    <div style="text-align:center; margin-bottom:24px;">
+      <div style="font-size:20px; font-weight:700; color:#1a1a2e;">押题效果报告</div>
+      <div style="font-size:13px; color:#666; margin-top:4px;">可衡量、可追溯的押题效果数据</div>
+    </div>
+
+    <!-- Three Key Metrics -->
+    <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:20px; margin-bottom:24px;">
+      <div style="text-align:center; padding:20px; background:linear-gradient(135deg,#e74c3c,#c0392b); border-radius:12px; color:#fff;">
+        <div style="font-size:12px; opacity:0.8;">知识点圈定率</div>
+        <div style="font-size:40px; font-weight:700; margin-top:8px;">93%</div>
+        <div style="font-size:11px; opacity:0.7; margin-top:4px;">考试涉及知识点中被预测覆盖的比例</div>
+        <div style="margin-top:12px; padding:6px; background:rgba(255,255,255,0.15); border-radius:4px; font-size:11px;">
+          考试涉及15个知识点，预测覆盖14个
+        </div>
+      </div>
+      <div style="text-align:center; padding:20px; background:linear-gradient(135deg,#f39c12,#e67e22); border-radius:12px; color:#fff;">
+        <div style="font-size:12px; opacity:0.8;">相似题压中率</div>
+        <div style="font-size:40px; font-weight:700; margin-top:8px;">71%</div>
+        <div style="font-size:11px; opacity:0.7; margin-top:4px;">押题与真题在知识点+题型上相似的比例</div>
+        <div style="margin-top:12px; padding:6px; background:rgba(255,255,255,0.15); border-radius:4px; font-size:11px;">
+          押题28道，与20道真题高度相似
+        </div>
+      </div>
+      <div style="text-align:center; padding:20px; background:linear-gradient(135deg,#27ae60,#219a52); border-radius:12px; color:#fff;">
+        <div style="font-size:12px; opacity:0.8;">原题押中率</div>
+        <div style="font-size:40px; font-weight:700; margin-top:8px;">35%</div>
+        <div style="font-size:11px; opacity:0.7; margin-top:4px;">押题与真题在数据+结构上完全一致的比例</div>
+        <div style="margin-top:12px; padding:6px; background:rgba(255,255,255,0.15); border-radius:4px; font-size:11px;">
+          押题28道，与10道真题完全一致
+        </div>
+      </div>
+    </div>
+
+    <!-- Hit Details Table -->
+    <div style="margin-bottom:24px;">
+      <div style="font-size:14px; font-weight:700; margin-bottom:12px;">命中详情 · 2026年4月月测</div>
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>真题题号</th>
+            <th>知识点</th>
+            <th>对应押题</th>
+            <th>命中类型</th>
+            <th>占分</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>第3题</td>
+            <td>因式分解</td>
+            <td>押题第4题</td>
+            <td><span class="tag tag-green">原题命中</span></td>
+            <td>3分</td>
+          </tr>
+          <tr>
+            <td>第5题</td>
+            <td>全等三角形证明</td>
+            <td>押题第3题</td>
+            <td><span class="tag tag-green">原题命中</span></td>
+            <td>6分</td>
+          </tr>
+          <tr>
+            <td>第8题</td>
+            <td>一次函数图像</td>
+            <td>押题第1题</td>
+            <td><span class="tag tag-orange">相似命中</span></td>
+            <td>4分</td>
+          </tr>
+          <tr>
+            <td>第12题</td>
+            <td>不等式组</td>
+            <td>押题第2题</td>
+            <td><span class="tag tag-orange">相似命中</span></td>
+            <td>3分</td>
+          </tr>
+          <tr>
+            <td>第15题</td>
+            <td>二元一次方程组</td>
+            <td>押题第5题</td>
+            <td><span class="tag tag-orange">相似命中</span></td>
+            <td>6分</td>
+          </tr>
+          <tr>
+            <td>第18题</td>
+            <td>一次函数应用</td>
+            <td>押题第1题</td>
+            <td><span class="tag tag-blue">知识点命中</span></td>
+            <td>8分</td>
+          </tr>
+          <tr style="color:#999;">
+            <td>第1题</td>
+            <td>实数运算</td>
+            <td>-</td>
+            <td><span class="tag" style="background:#f0f0f0; color:#999;">未覆盖</span></td>
+            <td>3分</td>
+          </tr>
+          <tr style="color:#999;">
+            <td>第2题</td>
+            <td>科学记数法</td>
+            <td>-</td>
+            <td><span class="tag" style="background:#f0f0f0; color:#999;">未覆盖</span></td>
+            <td>3分</td>
+          </tr>
+        </tbody>
+      </table>
+      <div style="margin-top:8px; font-size:11px; color:#999;">
+        共28道真题，命中26道（知识点覆盖），其中原题10道、相似10道。未覆盖2道为基础送分题，不计入命中率计算。
+      </div>
+    </div>
+
+    <!-- Trend Chart -->
+    <div style="margin-bottom:24px;">
+      <div style="font-size:14px; font-weight:700; margin-bottom:12px;">命中率趋势</div>
+      <div class="card" style="padding:16px;">
+        <div style="display:flex; align-items:flex-end; gap:24px; height:200px; padding:0 8px;">
+          <!-- Month labels -->
+          <div style="flex:1; display:flex; flex-direction:column; align-items:center;">
+            <div style="font-size:10px; color:#999; margin-bottom:8px;">2月周测</div>
+            <div style="width:100%; display:flex; justify-content:center; gap:4px; align-items:flex-end; height:160px;">
+              <div style="width:16px; background:#e74c3c; border-radius:4px 4px 0 0; height:85%;" title="圈定率85%"></div>
+              <div style="width:16px; background:#f39c12; border-radius:4px 4px 0 0; height:55%;" title="相似55%"></div>
+              <div style="width:16px; background:#27ae60; border-radius:4px 4px 0 0; height:25%;" title="原题25%"></div>
+            </div>
+          </div>
+          <div style="flex:1; display:flex; flex-direction:column; align-items:center;">
+            <div style="font-size:10px; color:#999; margin-bottom:8px;">3月月测</div>
+            <div style="width:100%; display:flex; justify-content:center; gap:4px; align-items:flex-end; height:160px;">
+              <div style="width:16px; background:#e74c3c; border-radius:4px 4px 0 0; height:90%;" title="圈定率90%"></div>
+              <div style="width:16px; background:#f39c12; border-radius:4px 4px 0 0; height:63%;" title="相似63%"></div>
+              <div style="width:16px; background:#27ae60; border-radius:4px 4px 0 0; height:30%;" title="原题30%"></div>
+            </div>
+          </div>
+          <div style="flex:1; display:flex; flex-direction:column; align-items:center;">
+            <div style="font-size:10px; color:#999; margin-bottom:8px;">4月周测</div>
+            <div style="width:100%; display:flex; justify-content:center; gap:4px; align-items:flex-end; height:160px;">
+              <div style="width:16px; background:#e74c3c; border-radius:4px 4px 0 0; height:92%;" title="圈定率92%"></div>
+              <div style="width:16px; background:#f39c12; border-radius:4px 4px 0 0; height:68%;" title="相似68%"></div>
+              <div style="width:16px; background:#27ae60; border-radius:4px 4px 0 0; height:32%;" title="原题32%"></div>
+            </div>
+          </div>
+          <div style="flex:1; display:flex; flex-direction:column; align-items:center;">
+            <div style="font-size:10px; color:#999; margin-bottom:8px; font-weight:600;">4月月测</div>
+            <div style="width:100%; display:flex; justify-content:center; gap:4px; align-items:flex-end; height:160px;">
+              <div style="width:16px; background:#e74c3c; border-radius:4px 4px 0 0; height:93%;" title="圈定率93%"></div>
+              <div style="width:16px; background:#f39c12; border-radius:4px 4px 0 0; height:71%;" title="相似71%"></div>
+              <div style="width:16px; background:#27ae60; border-radius:4px 4px 0 0; height:35%;" title="原题35%"></div>
+            </div>
+          </div>
+          <div style="flex:1; display:flex; flex-direction:column; align-items:center;">
+            <div style="font-size:10px; color:#999; margin-bottom:8px;">期末（预测）</div>
+            <div style="width:100%; display:flex; justify-content:center; gap:4px; align-items:flex-end; height:160px;">
+              <div style="width:16px; background:#ddd; border-radius:4px 4px 0 0; height:95%; border:2px dashed #ccc;" title="圈定率预测95%"></div>
+              <div style="width:16px; background:#ddd; border-radius:4px 4px 0 0; height:75%; border:2px dashed #ccc;" title="相似预测75%"></div>
+              <div style="width:16px; background:#ddd; border-radius:4px 4px 0 0; height:40%; border:2px dashed #ccc;" title="原题预测40%"></div>
+            </div>
+          </div>
+        </div>
+        <div style="display:flex; justify-content:center; gap:16px; margin-top:12px; font-size:11px;">
+          <div style="display:flex; align-items:center; gap:4px;"><div style="width:12px; height:12px; background:#e74c3c; border-radius:2px;"></div>知识点圈定率</div>
+          <div style="display:flex; align-items:center; gap:4px;"><div style="width:12px; height:12px; background:#f39c12; border-radius:2px;"></div>相似题压中率</div>
+          <div style="display:flex; align-items:center; gap:4px;"><div style="width:12px; height:12px; background:#27ae60; border-radius:2px;"></div>原题押中率</div>
+          <div style="display:flex; align-items:center; gap:4px;"><div style="width:12px; height:12px; background:#ddd; border:1px dashed #ccc; border-radius:2px;"></div>AI预测值</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Score Contribution -->
+    <div class="card" style="padding:16px;">
+      <div style="font-size:14px; font-weight:700; margin-bottom:12px;">押题对学生的提分贡献</div>
+      <div style="display:grid; grid-template-columns:repeat(3, 1fr); gap:16px;">
+        <div style="text-align:center; padding:12px; background:#f8f9fa; border-radius:8px;">
+          <div style="font-size:11px; color:#999;">平均多拿分数</div>
+          <div style="font-size:28px; font-weight:700; color:#27ae60;">+12分</div>
+          <div style="font-size:10px; color:#666; margin-top:4px;">相比不做押题练习</div>
+        </div>
+        <div style="text-align:center; padding:12px; background:#f8f9fa; border-radius:8px;">
+          <div style="font-size:11px; color:#999;">最高提分学生</div>
+          <div style="font-size:28px; font-weight:700; color:#4a90e2;">+22分</div>
+          <div style="font-size:10px; color:#666; margin-top:4px;">赵雨萱 · 完成所有押题</div>
+        </div>
+        <div style="text-align:center; padding:12px; background:#f8f9fa; border-radius:8px;">
+          <div style="font-size:11px; color:#999;">未完成押题学生</div>
+          <div style="font-size:28px; font-weight:700; color:#e74c3c;">+3分</div>
+          <div style="font-size:10px; color:#666; margin-top:4px;">仅靠自然提分</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+
+  </div>
+</div>
+
+<script>
+function showPage(pageId) {
+  // Hide all pages
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  // Show target page
+  document.getElementById('page-' + pageId).classList.add('active');
+
+  // Update nav
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  event.currentTarget.classList.add('active');
+
+  // Update topbar
+  const titles = {
+    's-home': ['首页工作台', '学生端 App / 首页'],
+    's-diagnosis': ['升学诊断报告', '学生端 App / 诊断'],
+    's-errclear': ['AI错题精准清零', '学生端 App / 错题清零'],
+    's-quiz': ['押题与周测', '学生端 App / 押题'],
+    's-exam': ['试卷拍照收集', '学生端 App / 试卷收集'],
+    'p-report': ['周学习报告', '家长端小程序 / 报告'],
+    'p-plan': ['升学规划', '家长端小程序 / 升学'],
+    't-dashboard': ['工作台总览', '辅导老师工作台 / 学生管理'],
+    't-student': ['学生详情', '辅导老师工作台 / 学生详情'],
+    'core-trace': ['推荐可溯源', '核心交互 / 溯源链'],
+    'core-quiz': ['押题效果报告', '核心交互 / 效果报告']
+  };
+  if (titles[pageId]) {
+    document.getElementById('topbarTitle').textContent = titles[pageId][0];
+    document.getElementById('topbarMeta').textContent = titles[pageId][1];
+  }
+}
+</script>
+
+</body>
+</html>
