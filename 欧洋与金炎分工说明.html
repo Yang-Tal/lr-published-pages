@@ -1,0 +1,1254 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>欧洋 × 金炎 分工说明</title>
+<style>
+  :root {
+    --bg: #0f1117;
+    --surface: #1a1d27;
+    --surface2: #222632;
+    --border: #2e3348;
+    --text: #e8eaf0;
+    --text2: #9ba3b5;
+    --jinyan: #f59e42;
+    --ouyang: #38bdf8;
+    --accent: #a78bfa;
+    --danger: #f87171;
+    --success: #4ade80;
+    --radius: 12px;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.7;
+    min-height: 100vh;
+  }
+  /* Navigation */
+  .nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    background: rgba(15,17,23,0.85);
+    backdrop-filter: blur(20px);
+    border-bottom: 1px solid var(--border);
+    padding: 0 24px;
+    display: flex; align-items: center; gap: 6px;
+    height: 56px;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .nav::-webkit-scrollbar { display: none; }
+  .nav-btn {
+    flex-shrink: 0;
+    background: none; border: 1px solid transparent;
+    color: var(--text2); font-size: 13px;
+    padding: 6px 14px; border-radius: 8px;
+    cursor: pointer; transition: all 0.2s;
+    white-space: nowrap;
+  }
+  .nav-btn:hover { color: var(--text); background: var(--surface2); }
+  .nav-btn.active { color: var(--accent); border-color: var(--accent); background: rgba(167,139,250,0.1); }
+  .nav-brand {
+    font-weight: 700; font-size: 15px; color: var(--text);
+    margin-right: 12px; flex-shrink: 0;
+  }
+  /* Main */
+  .main {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 80px 24px 60px;
+  }
+  /* Hero */
+  .hero {
+    text-align: center;
+    padding: 48px 0 40px;
+  }
+  .hero h1 {
+    font-size: 36px; font-weight: 800;
+    background: linear-gradient(135deg, var(--jinyan), var(--accent), var(--ouyang));
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 16px;
+  }
+  .hero p {
+    font-size: 16px; color: var(--text2);
+    max-width: 520px; margin: 0 auto;
+  }
+  /* Section */
+  .section {
+    margin-bottom: 16px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    background: var(--surface);
+    overflow: hidden;
+    transition: all 0.3s;
+  }
+  .section:hover {
+    border-color: rgba(167,139,250,0.3);
+  }
+  .section-header {
+    display: flex; align-items: center; gap: 12px;
+    padding: 20px 24px;
+    cursor: pointer;
+    user-select: none;
+    transition: background 0.2s;
+  }
+  .section-header:hover { background: var(--surface2); }
+  .section-num {
+    flex-shrink: 0;
+    width: 32px; height: 32px;
+    display: flex; align-items: center; justify-content: center;
+    background: linear-gradient(135deg, var(--accent), #7c3aed);
+    border-radius: 8px;
+    font-size: 14px; font-weight: 700; color: #fff;
+  }
+  .section-title {
+    flex: 1;
+    font-size: 18px; font-weight: 700;
+  }
+  .section-chevron {
+    flex-shrink: 0;
+    width: 24px; height: 24px;
+    transition: transform 0.3s;
+    color: var(--text2);
+  }
+  .section.open .section-chevron { transform: rotate(180deg); }
+  .section-body {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  .section.open .section-body {
+    max-height: 5000px;
+  }
+  .section-content {
+    padding: 0 24px 24px;
+    border-top: 1px solid var(--border);
+  }
+  .section-content > *:first-child { margin-top: 20px; }
+  /* Person card */
+  .person-card {
+    border-radius: var(--radius);
+    padding: 24px;
+    margin-bottom: 16px;
+    position: relative;
+    overflow: hidden;
+  }
+  .person-card::before {
+    content: '';
+    position: absolute; top: 0; left: 0; right: 0;
+    height: 3px;
+  }
+  .person-jinyan { background: rgba(245,158,66,0.08); border: 1px solid rgba(245,158,66,0.2); }
+  .person-jinyan::before { background: linear-gradient(90deg, var(--jinyan), #f97316); }
+  .person-ouyang { background: rgba(56,189,248,0.08); border: 1px solid rgba(56,189,248,0.2); }
+  .person-ouyang::before { background: linear-gradient(90deg, var(--ouyang), #0ea5e9); }
+  .person-name {
+    font-size: 20px; font-weight: 800; margin-bottom: 4px;
+  }
+  .person-jinyan .person-name { color: var(--jinyan); }
+  .person-ouyang .person-name { color: var(--ouyang); }
+  .person-role { font-size: 13px; color: var(--text2); margin-bottom: 16px; }
+  .person-mission {
+    font-size: 15px; font-weight: 600;
+    padding: 8px 14px;
+    border-radius: 8px;
+    margin-bottom: 16px;
+    display: inline-block;
+  }
+  .person-jinyan .person-mission { background: rgba(245,158,66,0.15); color: var(--jinyan); }
+  .person-ouyang .person-mission { background: rgba(56,189,248,0.15); color: var(--ouyang); }
+  /* Duty items */
+  .duty {
+    margin-bottom: 20px;
+  }
+  .duty-title {
+    font-size: 15px; font-weight: 700;
+    margin-bottom: 8px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .duty-title .dot {
+    width: 6px; height: 6px; border-radius: 50%;
+    flex-shrink: 0;
+  }
+  .person-jinyan .dot { background: var(--jinyan); }
+  .person-ouyang .dot { background: var(--ouyang); }
+  .duty-desc {
+    font-size: 14px; color: var(--text2);
+    margin-bottom: 10px;
+    padding-left: 14px;
+  }
+  /* Table */
+  .tbl {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+    margin: 12px 0;
+    border-radius: 8px;
+    overflow: hidden;
+  }
+  .tbl th {
+    background: var(--surface2);
+    font-weight: 600;
+    text-align: left;
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--border);
+    color: var(--text2);
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  .tbl td {
+    padding: 10px 14px;
+    border-bottom: 1px solid rgba(46,51,72,0.5);
+    color: var(--text);
+    vertical-align: top;
+  }
+  .tbl tr:last-child td { border-bottom: none; }
+  .tbl tr:hover td { background: rgba(167,139,250,0.05); }
+  /* Comparison table */
+  .cmp-table { display: grid; grid-template-columns: 1fr 1fr; gap: 1px; background: var(--border); border-radius: 8px; overflow: hidden; margin: 12px 0; }
+  .cmp-cell { padding: 12px 16px; background: var(--surface); }
+  .cmp-label { font-size: 11px; color: var(--text2); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px; }
+  .cmp-val { font-size: 14px; font-weight: 600; }
+  .cmp-jinyan .cmp-val { color: var(--jinyan); }
+  .cmp-ouyang .cmp-val { color: var(--ouyang); }
+  /* Flow chart */
+  .flow {
+    display: flex; align-items: stretch; gap: 0;
+    margin: 20px 0;
+    border-radius: var(--radius);
+    overflow: hidden;
+  }
+  .flow-box {
+    flex: 1;
+    padding: 20px;
+    display: flex; flex-direction: column; justify-content: center;
+  }
+  .flow-box.jinyan-box { background: rgba(245,158,66,0.1); }
+  .flow-box.ouyang-box { background: rgba(56,189,248,0.1); }
+  .flow-box .flow-label { font-size: 12px; color: var(--text2); margin-bottom: 8px; }
+  .flow-box .flow-name { font-size: 15px; font-weight: 700; margin-bottom: 10px; }
+  .flow-box .flow-step { font-size: 13px; margin-bottom: 6px; display: flex; align-items: flex-start; gap: 6px; }
+  .flow-box .flow-step-num {
+    flex-shrink: 0; width: 20px; height: 20px;
+    display: flex; align-items: center; justify-content: center;
+    border-radius: 50%; font-size: 11px; font-weight: 700; color: #fff;
+  }
+  .jinyan-box .flow-step-num { background: var(--jinyan); }
+  .ouyang-box .flow-step-num { background: var(--ouyang); }
+  .flow-arrows {
+    display: flex; flex-direction: column; justify-content: center;
+    padding: 0 4px; font-size: 20px; color: var(--text2);
+    gap: 12px;
+  }
+  /* Conflict card */
+  .conflict {
+    background: var(--surface2);
+    border-radius: var(--radius);
+    margin-bottom: 12px;
+    overflow: hidden;
+    border: 1px solid var(--border);
+  }
+  .conflict-header {
+    display: flex; align-items: center; gap: 10px;
+    padding: 14px 18px;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+  .conflict-header:hover { background: rgba(255,255,255,0.03); }
+  .conflict-badge {
+    flex-shrink: 0;
+    padding: 2px 10px;
+    border-radius: 6px;
+    font-size: 11px; font-weight: 700;
+    background: rgba(248,113,113,0.15);
+    color: var(--danger);
+  }
+  .conflict-title { flex: 1; font-size: 14px; font-weight: 600; }
+  .conflict-chevron {
+    flex-shrink: 0;
+    width: 18px; height: 18px;
+    transition: transform 0.3s;
+    color: var(--text2);
+  }
+  .conflict.open .conflict-chevron { transform: rotate(180deg); }
+  .conflict-body {
+    max-height: 0; overflow: hidden;
+    transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  .conflict.open .conflict-body { max-height: 3000px; }
+  .conflict-content {
+    padding: 0 18px 16px;
+    border-top: 1px solid var(--border);
+  }
+  .conflict-content > *:first-child { margin-top: 14px; }
+  .vs-row {
+    display: grid; grid-template-columns: 1fr auto 1fr; gap: 12px;
+    align-items: center;
+    margin: 10px 0;
+    font-size: 13px;
+  }
+  .vs-side { padding: 10px 14px; border-radius: 8px; }
+  .vs-jinyan { background: rgba(245,158,66,0.1); }
+  .vs-ouyang { background: rgba(56,189,248,0.1); }
+  .vs-center { font-weight: 800; color: var(--danger); font-size: 14px; }
+  .conflict-nature {
+    text-align: center; font-size: 12px;
+    color: var(--accent); font-weight: 600;
+    margin: 8px 0 12px;
+    padding: 4px 12px;
+    background: rgba(167,139,250,0.1);
+    border-radius: 6px;
+    display: inline-block;
+  }
+  .solution-list {
+    list-style: none; padding: 0;
+  }
+  .solution-list li {
+    font-size: 13px; color: var(--text2);
+    margin-bottom: 8px;
+    padding-left: 20px;
+    position: relative;
+  }
+  .solution-list li::before {
+    content: '→';
+    position: absolute; left: 0;
+    color: var(--success); font-weight: 700;
+  }
+  .judge {
+    font-size: 13px;
+    padding: 10px 14px;
+    background: rgba(74,222,128,0.08);
+    border: 1px solid rgba(74,222,128,0.2);
+    border-radius: 8px;
+    margin-top: 10px;
+    color: var(--success);
+  }
+  /* Screenwriter-Director model */
+  .sd-model {
+    margin: 14px 0;
+    padding: 16px;
+    background: rgba(167,139,250,0.08);
+    border: 1px solid rgba(167,139,250,0.2);
+    border-radius: var(--radius);
+  }
+  .sd-model-title {
+    font-size: 15px; font-weight: 700; color: var(--accent);
+    margin-bottom: 10px;
+  }
+  .sd-model-desc {
+    font-size: 13px; color: var(--text2);
+    margin-bottom: 14px;
+  }
+  .sd-roles {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 12px;
+    margin-bottom: 16px;
+  }
+  .sd-role {
+    padding: 12px;
+    border-radius: 8px;
+  }
+  .sd-role-jy { background: rgba(245,158,66,0.1); }
+  .sd-role-oy { background: rgba(56,189,248,0.1); }
+  .sd-role-label { font-size: 11px; color: var(--text2); margin-bottom: 4px; }
+  .sd-role-val { font-size: 14px; font-weight: 700; }
+  .sd-role-jy .sd-role-val { color: var(--jinyan); }
+  .sd-role-oy .sd-role-val { color: var(--ouyang); }
+  /* Case sub-sections */
+  .case-section {
+    margin: 14px 0;
+    border-radius: 8px;
+    overflow: hidden;
+    border: 1px solid var(--border);
+  }
+  .case-header {
+    display: flex; align-items: center; gap: 8px;
+    padding: 10px 14px;
+    background: var(--surface2);
+    cursor: pointer;
+    font-size: 13px; font-weight: 600;
+    transition: background 0.2s;
+  }
+  .case-header:hover { background: rgba(255,255,255,0.05); }
+  .case-chevron {
+    width: 16px; height: 16px;
+    transition: transform 0.3s;
+    color: var(--text2);
+  }
+  .case-section.open .case-chevron { transform: rotate(90deg); }
+  .case-body {
+    max-height: 0; overflow: hidden;
+    transition: max-height 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  .case-section.open .case-body { max-height: 1000px; }
+  .case-content {
+    padding: 12px 14px;
+  }
+  /* Principle card */
+  .principle {
+    padding: 20px;
+    background: var(--surface2);
+    border-radius: var(--radius);
+    margin-bottom: 12px;
+    border: 1px solid var(--border);
+  }
+  .principle-name {
+    font-size: 16px; font-weight: 700; color: var(--accent);
+    margin-bottom: 10px;
+  }
+  /* Advantage card */
+  .advantage {
+    display: flex; gap: 14px;
+    padding: 16px;
+    background: var(--surface2);
+    border-radius: var(--radius);
+    margin-bottom: 10px;
+    border: 1px solid var(--border);
+  }
+  .adv-num {
+    flex-shrink: 0;
+    width: 28px; height: 28px;
+    display: flex; align-items: center; justify-content: center;
+    background: linear-gradient(135deg, var(--accent), #7c3aed);
+    border-radius: 50%;
+    font-size: 13px; font-weight: 700; color: #fff;
+  }
+  .adv-content { flex: 1; }
+  .adv-title { font-size: 14px; font-weight: 700; margin-bottom: 4px; }
+  .adv-desc { font-size: 13px; color: var(--text2); }
+  /* Calendar */
+  .cal-item {
+    display: flex; align-items: center; gap: 14px;
+    padding: 12px 16px;
+    background: var(--surface2);
+    border-radius: 8px;
+    margin-bottom: 8px;
+    border: 1px solid var(--border);
+  }
+  .cal-freq {
+    flex-shrink: 0;
+    padding: 3px 10px;
+    border-radius: 6px;
+    font-size: 11px; font-weight: 700;
+    background: rgba(167,139,250,0.15);
+    color: var(--accent);
+    min-width: 60px;
+    text-align: center;
+  }
+  .cal-who {
+    flex-shrink: 0;
+    font-size: 12px; font-weight: 600;
+    padding: 2px 8px;
+    border-radius: 4px;
+  }
+  .cal-jinyan { background: rgba(245,158,66,0.15); color: var(--jinyan); }
+  .cal-ouyang { background: rgba(56,189,248,0.15); color: var(--ouyang); }
+  .cal-both { background: rgba(167,139,250,0.15); color: var(--accent); }
+  .cal-what { flex: 1; font-size: 13px; font-weight: 500; }
+  .cal-output { font-size: 12px; color: var(--text2); max-width: 200px; }
+  /* Summary grid */
+  .summary-grid {
+    display: grid; grid-template-columns: auto 1fr 1fr; gap: 0;
+    border-radius: var(--radius);
+    overflow: hidden;
+    border: 1px solid var(--border);
+  }
+  .summary-cell {
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--border);
+    border-right: 1px solid var(--border);
+    font-size: 13px;
+  }
+  .summary-cell:nth-child(3n) { border-right: none; }
+  .summary-cell:nth-last-child(-n+3) { border-bottom: none; }
+  .summary-label { background: var(--surface2); font-weight: 600; color: var(--text2); font-size: 12px; white-space: nowrap; }
+  .summary-jy { color: var(--jinyan); }
+  .summary-oy { color: var(--ouyang); }
+  /* Quote */
+  .quote {
+    font-size: 13px; color: var(--text2);
+    padding: 10px 14px;
+    border-left: 3px solid var(--accent);
+    background: rgba(167,139,250,0.05);
+    border-radius: 0 8px 8px 0;
+    margin: 10px 0;
+  }
+  /* Tag */
+  .tag {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 11px; font-weight: 600;
+  }
+  .tag-jy { background: rgba(245,158,66,0.15); color: var(--jinyan); }
+  .tag-oy { background: rgba(56,189,248,0.15); color: var(--ouyang); }
+  /* Animation */
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+  .section { animation: fadeIn 0.4s ease both; }
+  .section:nth-child(2) { animation-delay: 0.05s; }
+  .section:nth-child(3) { animation-delay: 0.1s; }
+  .section:nth-child(4) { animation-delay: 0.15s; }
+  .section:nth-child(5) { animation-delay: 0.2s; }
+  .section:nth-child(6) { animation-delay: 0.25s; }
+  .section:nth-child(7) { animation-delay: 0.3s; }
+  .section:nth-child(8) { animation-delay: 0.35s; }
+  /* Responsive */
+  @media (max-width: 640px) {
+    .hero h1 { font-size: 26px; }
+    .section-header { padding: 16px 18px; }
+    .section-content { padding: 0 18px 18px; }
+    .flow { flex-direction: column; }
+    .flow-arrows { flex-direction: row; justify-content: center; padding: 8px 0; }
+    .sd-roles { grid-template-columns: 1fr; }
+    .vs-row { grid-template-columns: 1fr; gap: 6px; }
+    .vs-center { display: none; }
+    .cmp-table { grid-template-columns: 1fr 1fr; }
+    .cal-output { display: none; }
+  }
+  /* Expand all / collapse all */
+  .toolbar {
+    display: flex; justify-content: flex-end; gap: 8px;
+    margin-bottom: 16px;
+  }
+  .tool-btn {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    color: var(--text2);
+    padding: 6px 14px;
+    border-radius: 8px;
+    font-size: 12px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .tool-btn:hover { color: var(--text); border-color: var(--accent); }
+  /* SVG icons */
+  .icon-chev { display: inline-block; vertical-align: middle; }
+</style>
+</head>
+<body>
+
+<!-- Nav -->
+<nav class="nav">
+  <span class="nav-brand">📋 分工说明</span>
+  <button class="nav-btn" onclick="scrollToSection('s1')">当前问题</button>
+  <button class="nav-btn" onclick="scrollToSection('s2')">分工原则</button>
+  <button class="nav-btn" onclick="scrollToSection('s3')">详细分工</button>
+  <button class="nav-btn" onclick="scrollToSection('s4')">协作协议</button>
+  <button class="nav-btn" onclick="scrollToSection('s5')">思路依据</button>
+  <button class="nav-btn" onclick="scrollToSection('s6')">优势</button>
+  <button class="nav-btn" onclick="scrollToSection('s7')">冲突与解决</button>
+  <button class="nav-btn" onclick="scrollToSection('s8')">总结</button>
+</nav>
+
+<div class="main">
+  <!-- Hero -->
+  <div class="hero">
+    <h1>欧洋 × 金炎 分工说明</h1>
+    <p>清晰划分教学产品经理与游戏化激励产品经理的职责边界，确保各自在闭环范围内有充分的施展空间与明确的工作目标</p>
+  </div>
+
+  <!-- Toolbar -->
+  <div class="toolbar">
+    <button class="tool-btn" onclick="toggleAll(true)">展开全部</button>
+    <button class="tool-btn" onclick="toggleAll(false)">收起全部</button>
+  </div>
+
+  <!-- 一、当前问题 -->
+  <div class="section" id="s1">
+    <div class="section-header" onclick="toggleSection(this)">
+      <div class="section-num">1</div>
+      <div class="section-title">当前问题</div>
+      <svg class="section-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+    </div>
+    <div class="section-body">
+      <div class="section-content">
+        <p style="font-size:15px;font-weight:600;margin-bottom:12px;">欧洋目前同时承担了 <span style="color:var(--ouyang)">教学注意力</span> 和 <span style="color:var(--jinyan)">游戏注意力</span> 两类职责：</p>
+        <div class="vs-row" style="margin-bottom:16px;">
+          <div class="vs-side vs-ouyang">
+            <strong style="color:var(--ouyang)">教学侧</strong><br>
+            课堂PK、伴学、学习任务设计<br>→ 需要学生<strong>专注学习</strong>
+          </div>
+          <div class="vs-center">VS</div>
+          <div class="vs-side vs-jinyan">
+            <strong style="color:var(--jinyan)">游戏侧</strong><br>
+            海星兑换虚拟物品、宝石换宠物套装<br>→ 需要学生<strong>沉浸游戏</strong>
+          </div>
+        </div>
+        <p style="font-size:14px;font-weight:600;margin-bottom:10px;">两者混在一起，导致三个问题：</p>
+        <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:20px;">
+          <div style="padding:12px 16px;background:rgba(248,113,113,0.08);border:1px solid rgba(248,113,113,0.2);border-radius:8px;font-size:13px;">
+            <strong style="color:var(--danger)">问题1</strong>　<strong>游戏元素干扰教学</strong> — 教学环节中插入了游戏化消耗场景，学生注意力从"学习"被吸引到"玩耍"
+          </div>
+          <div style="padding:12px 16px;background:rgba(248,113,113,0.08);border:1px solid rgba(248,113,113,0.2);border-radius:8px;font-size:13px;">
+            <strong style="color:var(--danger)">问题2</strong>　<strong>游戏化缺乏深度</strong> — 游戏化元素散落在各教学模块中，没有独立的养成闭环，代币消耗场景碎片化
+          </div>
+          <div style="padding:12px 16px;background:rgba(248,113,113,0.08);border:1px solid rgba(248,113,113,0.2);border-radius:8px;font-size:13px;">
+            <strong style="color:var(--danger)">问题3</strong>　<strong>职责打架</strong> — 金炎被定位为游戏化激励产品经理，但核心消耗场景实际被欧洋攥着
+          </div>
+        </div>
+
+        <div style="padding:16px;background:rgba(74,222,128,0.08);border:1px solid rgba(74,222,128,0.2);border-radius:var(--radius);">
+          <p style="font-size:14px;font-weight:700;color:var(--success);margin-bottom:8px;">🎯 我们要做什么</p>
+          <p style="font-size:13px;color:var(--text2);margin-bottom:10px;">将"教学注意力"和"游戏注意力"拆分开来：</p>
+          <ul style="font-size:13px;color:var(--text2);padding-left:18px;margin-bottom:12px;">
+            <li><span style="color:var(--ouyang)">欧洋</span>保证学生的注意力在学习上</li>
+            <li><span style="color:var(--jinyan)">金炎</span>让学生获得的各种代币变得有意义、有意思</li>
+          </ul>
+          <p style="font-size:15px;font-weight:700;text-align:center;color:var(--success);">学得专注 → 获得代币 → 花得爽 → 更愿意学</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 二、分工原则 -->
+  <div class="section" id="s2">
+    <div class="section-header" onclick="toggleSection(this)">
+      <div class="section-num">2</div>
+      <div class="section-title">分工原则</div>
+      <svg class="section-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+    </div>
+    <div class="section-body">
+      <div class="section-content">
+        <div class="principle">
+          <div class="principle-name">原则一：产出端 vs 消耗端分离</div>
+          <div class="cmp-table">
+            <div class="cmp-cell cmp-label">维度</div>
+            <div class="cmp-cell cmp-label" style="color:var(--ouyang)">欧洋</div>
+            <div class="cmp-cell cmp-label" style="color:var(--jinyan)">金炎</div>
+            <div class="cmp-cell"><span class="cmp-label">一句话定位</span><div class="cmp-val cmp-ouyang">代币从哪来</div></div>
+            <div class="cmp-cell"><span class="cmp-label">核心问题</span><div style="font-size:13px">学生做了什么学习行为，获得什么激励？</div></div>
+            <div class="cmp-cell"><span class="cmp-label">核心问题</span><div style="font-size:13px">学生拿到的代币能花在哪里、换来什么？</div></div>
+            <div class="cmp-cell"><span class="cmp-label">注意力方向</span><div class="cmp-val cmp-ouyang">学习</div></div>
+            <div class="cmp-cell"><span class="cmp-label">注意力方向</span><div class="cmp-val cmp-jinyan">游戏 / 养成</div></div>
+          </div>
+        </div>
+
+        <div class="principle">
+          <div class="principle-name">原则二：架构权 vs 应用权分离</div>
+          <table class="tbl">
+            <tr><th>维度</th><th style="color:var(--jinyan)">金炎（架构层）</th><th style="color:var(--ouyang)">欧洋（应用层）</th></tr>
+            <tr><td>有什么类型</td><td>✅ 金炎定</td><td>❌</td></tr>
+            <tr><td>用哪个类型</td><td>❌</td><td>✅ 欧洋定</td></tr>
+            <tr><td>世界观合规</td><td>✅ 金炎定义规则</td><td>✅ 欧洋遵守规则</td></tr>
+            <tr><td>给多少</td><td>❌</td><td>✅ 欧洋定</td></tr>
+          </table>
+        </div>
+
+        <div class="principle">
+          <div class="principle-name">原则三：定义权 vs 生效权分离</div>
+          <p style="font-size:14px;color:var(--text2);">
+            <span style="color:var(--jinyan)">金炎</span>定义道具的基础属性（如"这个头像框自带+5能量加成"），<span style="color:var(--ouyang)">欧洋</span>决定这个加成在教学场景中是否生效、生效的时机。
+          </p>
+          <div class="quote">金炎不需要理解每个教学场景的平衡逻辑，欧洋不需要决定道具应该有什么属性。</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 三、详细分工 -->
+  <div class="section" id="s3">
+    <div class="section-header" onclick="toggleSection(this)">
+      <div class="section-num">3</div>
+      <div class="section-title">详细分工</div>
+      <svg class="section-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+    </div>
+    <div class="section-body">
+      <div class="section-content">
+        <!-- 金炎 -->
+        <div class="person-card person-jinyan">
+          <div class="person-name">金炎</div>
+          <div class="person-role">游戏化激励产品经理 · 世界架构师 + 经济治理者</div>
+          <div class="person-mission">🎯 核心使命：让代币有意义，让学习外有乐趣</div>
+
+          <div class="duty">
+            <div class="duty-title"><span class="dot"></span>职责一：世界观定义</div>
+            <div class="duty-desc">定义星仔宇宙的叙事框架和规则逻辑——为什么有算力？为什么有海星？所有的玩法、道具、代币都必须在这个世界观里说得通。</div>
+            <div class="quote">例：星仔是硅基生命体，需要算力才能执行探索任务 → 算力在世界观里的意义是"驱动星仔探索的能源"</div>
+          </div>
+
+          <div class="duty">
+            <div class="duty-title"><span class="dot"></span>职责二：产出物类型定义 — 她<strong>决定"存在什么"</strong></div>
+            <table class="tbl">
+              <tr><th>类型</th><th>具体内容</th></tr>
+              <tr><td>通用货币</td><td>海星/星币的定位与用途</td></tr>
+              <tr><td>专属数值</td><td>探索算力的定义与消耗场景</td></tr>
+              <tr><td>可收集物</td><td>文明印记、纪念品等收集品类</td></tr>
+              <tr><td>可兑换物</td><td>皮肤、头像框、性格、爱好、道具等</td></tr>
+              <tr><td>道具属性</td><td>每个道具的基础属性（如"星辰头像框 · 基础属性 = +5能量"）</td></tr>
+            </table>
+          </div>
+
+          <div class="duty">
+            <div class="duty-title"><span class="dot"></span>职责三：消耗闭环设计</div>
+            <table class="tbl">
+              <tr><th>模块</th><th>核心设计</th></tr>
+              <tr><td>星仔探索（收集体系）</td><td>算力消耗、文明印记收集、纪念品、省份探索度</td></tr>
+              <tr><td>星仔小屋/养成（养成体系）</td><td>星币消耗兑换皮肤/头像框/性格/爱好，星仔的养成进化</td></tr>
+              <tr><td>成就体系</td><td>长期勋章、社交炫耀、外化展示</td></tr>
+              <tr><td>海星商城</td><td>虚拟/实物兑换的消耗场景设计</td></tr>
+            </table>
+          </div>
+
+          <div class="duty">
+            <div class="duty-title"><span class="dot"></span>职责四：经济调控</div>
+            <div class="duty-desc">根据全网校代币产出量，定期调整通胀系数、物价、兑换比例，保证经济体系健康。</div>
+            <div class="quote">金炎需要定期获取欧洋侧各场景的代币产出数据，据此做经济调控。</div>
+          </div>
+        </div>
+
+        <!-- 欧洋 -->
+        <div class="person-card person-ouyang">
+          <div class="person-name">欧洋</div>
+          <div class="person-role">教学产品经理 · 场景应用者 + 剂量调节者</div>
+          <div class="person-mission">🎯 核心使命：让学生愿意学、专注学</div>
+
+          <div class="duty">
+            <div class="duty-title"><span class="dot"></span>职责一：场景激励选型 — 她<strong>决定"用哪个"</strong></div>
+            <table class="tbl">
+              <tr><th>教学场景</th><th>选型示例</th></tr>
+              <tr><td>课堂小组PK</td><td>用"能量"做PK胜负判定，获胜额外获得"探索算力"</td></tr>
+              <tr><td>课上伴学</td><td>直播听课积累"探索算力"，下课前结算</td></tr>
+              <tr><td>课下PK答题</td><td>答题获得"海星"和"探索算力"</td></tr>
+              <tr><td>课后学习任务</td><td>完成任务获得"海星/星币"</td></tr>
+            </table>
+          </div>
+
+          <div class="duty">
+            <div class="duty-title"><span class="dot"></span>职责二：世界观合规</div>
+            <div class="duty-desc">选择的掉落类型必须符合金炎定义的世界观逻辑。不能凭空出现一个金炎没定义过的代币或道具。</div>
+            <div style="display:flex;gap:10px;margin-top:10px;">
+              <div style="flex:1;padding:10px;background:rgba(74,222,128,0.08);border:1px solid rgba(74,222,128,0.2);border-radius:8px;font-size:12px;">
+                <strong style="color:var(--success)">✅ 合规</strong><br>课堂伴学给算力 → 世界观里"帮星仔攒算力去探索"，逻辑通顺
+              </div>
+              <div style="flex:1;padding:10px;background:rgba(248,113,113,0.08);border:1px solid rgba(248,113,113,0.2);border-radius:8px;font-size:12px;">
+                <strong style="color:var(--danger)">❌ 不合规</strong><br>课堂上掉落"勇气勋章" → 世界观里不存在这个概念
+              </div>
+            </div>
+          </div>
+
+          <div class="duty">
+            <div class="duty-title"><span class="dot"></span>职责三：剂量调节 — 她<strong>决定"给多少"</strong></div>
+            <div class="duty-desc">每个环节掉多少，依据学生和老师的反馈、激励效果数据来校准。</div>
+            <div class="quote">例：答题给2海星还是5海星？PK获胜给10算力还是20算力？由欧洋根据教学反馈和激励效果决定。</div>
+          </div>
+
+          <div class="duty">
+            <div class="duty-title"><span class="dot"></span>职责四：教学注意力管理</div>
+            <table class="tbl">
+              <tr><th>注意力管理原则</th><th>说明</th></tr>
+              <tr><td>教学环节只做产出</td><td>课堂上只出代币，不消耗代币</td></tr>
+              <tr><td>不插入游戏化入口</td><td>教学场景不跳转到养成/商城/收集页面</td></tr>
+              <tr><td>星仔角色是"学习伙伴"</td><td>课堂伴学中的星仔是陪伴者，不是养成对象</td></tr>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 四、协作协议 -->
+  <div class="section" id="s4">
+    <div class="section-header" onclick="toggleSection(this)">
+      <div class="section-num">4</div>
+      <div class="section-title">协作协议</div>
+      <svg class="section-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+    </div>
+    <div class="section-body">
+      <div class="section-content">
+        <p style="font-size:16px;font-weight:700;margin-bottom:16px;">协作节奏</p>
+        <div class="flow">
+          <div class="flow-box jinyan-box">
+            <div class="flow-label">架构层</div>
+            <div class="flow-name" style="color:var(--jinyan)">金炎</div>
+            <div class="flow-step"><span class="flow-step-num">1</span>定义：有什么类型</div>
+            <div class="flow-step"><span class="flow-step-num">4</span>调控：通胀/物价</div>
+          </div>
+          <div class="flow-arrows">
+            <span>→→→</span>
+            <span>←←←</span>
+          </div>
+          <div class="flow-box ouyang-box">
+            <div class="flow-label">应用层</div>
+            <div class="flow-name" style="color:var(--ouyang)">欧洋</div>
+            <div class="flow-step"><span class="flow-step-num">2</span>选择：用哪个类型</div>
+            <div class="flow-step"><span class="flow-step-num">3</span>决定：给多少</div>
+          </div>
+        </div>
+
+        <table class="tbl" style="margin-top:16px;">
+          <tr><th>接口要素</th><th style="color:var(--jinyan)">金炎侧</th><th style="color:var(--ouyang)">欧洋侧</th></tr>
+          <tr><td><strong>海星/星币</strong></td><td>定义类型、用途、消耗场景</td><td>决定每个教学场景的产出量</td></tr>
+          <tr><td><strong>探索算力</strong></td><td>定义类型、消耗方式（星仔探索）</td><td>决定课堂PK/伴学/课下PK的产出量</td></tr>
+          <tr><td><strong>能量</strong></td><td>定义类型</td><td>欧洋独立闭环（课堂PK专属）</td></tr>
+          <tr><td><strong>皮肤/头像框</strong></td><td>定义类型、基础属性、获取方式</td><td>决定在教学场景中是否生效、生效时机</td></tr>
+          <tr><td><strong>成就数据</strong></td><td>定义成就规则和勋章设计</td><td>提供学习行为数据</td></tr>
+        </table>
+
+        <div style="margin-top:20px;padding:16px;background:var(--surface2);border-radius:var(--radius);border:1px solid var(--border);">
+          <p style="font-size:15px;font-weight:700;margin-bottom:12px;">道具属性协作规范</p>
+          <p style="font-size:13px;color:var(--text2);margin-bottom:10px;">金炎定义道具时，标注的是<strong style="color:var(--jinyan)">"潜在属性"</strong>而非"生效规则"：</p>
+          <div style="display:flex;gap:12px;flex-wrap:wrap;">
+            <div style="flex:1;min-width:200px;padding:12px;background:rgba(245,158,66,0.08);border:1px solid rgba(245,158,66,0.2);border-radius:8px;">
+              <strong style="color:var(--jinyan)">金炎输出</strong><br>
+              <span style="font-size:13px;">「星辰头像框 · 潜在属性 = +5能量」</span>
+            </div>
+            <div style="flex:1;min-width:200px;padding:12px;background:rgba(56,189,248,0.08);border:1px solid rgba(56,189,248,0.2);border-radius:8px;">
+              <strong style="color:var(--ouyang)">欧洋决定</strong><br>
+              <span style="font-size:13px;">课堂PK → 生效 ✓<br>课下PK → 不生效 ✗</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 五、分工思路与依据 -->
+  <div class="section" id="s5">
+    <div class="section-header" onclick="toggleSection(this)">
+      <div class="section-num">5</div>
+      <div class="section-title">分工思路与依据</div>
+      <svg class="section-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+    </div>
+    <div class="section-body">
+      <div class="section-content">
+        <div class="principle">
+          <div class="principle-name">为什么按"产出端 vs 消耗端"切分？</div>
+          <p style="font-size:13px;color:var(--text2);margin-bottom:10px;">游戏经济学的核心规律是<strong style="color:var(--text)">产出与消耗必须平衡</strong>。如果产出端和消耗端由同一个人负责：</p>
+          <ul style="font-size:13px;color:var(--text2);padding-left:18px;margin-bottom:12px;">
+            <li>她既决定"发多少"又决定"花多少"，没有制衡，容易导致经济失衡</li>
+            <li>她的注意力会在"让学生专注学习"和"让学生沉迷游戏"之间摇摆</li>
+          </ul>
+          <p style="font-size:13px;color:var(--success);font-weight:600;">拆开后 → 两人形成天然的制衡与协作关系：</p>
+          <ul style="font-size:13px;color:var(--text2);padding-left:18px;">
+            <li><span style="color:var(--ouyang)">欧洋</span>有动力多发代币（提升学习激励效果），但代币有没有价值取决于金炎设计的消耗场景</li>
+            <li><span style="color:var(--jinyan)">金炎</span>有动力控制代币价值（保证养成闭环有吸引力），但经济体系能不能运转取决于欧洋的产出量</li>
+          </ul>
+        </div>
+
+        <div class="principle">
+          <div class="principle-name">为什么"用什么"归欧洋、"有什么"归金炎？</div>
+          <p style="font-size:13px;color:var(--text2);">教学场景的激励选型需要深度理解教学逻辑——什么时候该用什么激励，是<strong style="color:var(--text)">教学设计问题</strong>，不是游戏设计问题。</p>
+          <div class="quote">例：课堂上应该用"即时反馈"（能量）还是"延迟满足"（算力）？这取决于课堂节奏和教学目标，只有欧洋能判断。</div>
+          <p style="font-size:13px;color:var(--text2);margin-top:8px;">但代币类型的存在必须在世界观里说得通，否则就会出现"体系冗余"——各类代币割裂、用户理解成本高。</p>
+        </div>
+
+        <div class="principle">
+          <div class="principle-name">为什么"给多少"归欧洋、"值多少"归金炎？</div>
+          <p style="font-size:13px;color:var(--text2);">剂量调节是教学场景的<strong style="color:var(--text)">实时决策</strong>，需要根据学生和老师的反馈快速调整。经济调控是全网校的<strong style="color:var(--text)">宏观决策</strong>，需要看全局产出数据。</p>
+          <div class="quote">如果"给多少"和"值多少"是同一个人定，她要么为了教学效果多发代币导致通胀，要么为了经济平衡压制教学激励效果。拆开之后，两人的目标各自清晰。</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 六、优势 -->
+  <div class="section" id="s6">
+    <div class="section-header" onclick="toggleSection(this)">
+      <div class="section-num">6</div>
+      <div class="section-title">这样安排的优势</div>
+      <svg class="section-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+    </div>
+    <div class="section-body">
+      <div class="section-content">
+        <div class="advantage">
+          <div class="adv-num">1</div>
+          <div class="adv-content">
+            <div class="adv-title">各自闭环，互不干扰</div>
+            <div class="adv-desc"><span style="color:var(--ouyang)">欧洋</span>KPI是教学效果指标（参课率、答题率、互动率）；<span style="color:var(--jinyan)">金炎</span>KPI是游戏化闭环指标（代币消耗率、养成深度、留存）。两人不再争抢同一块地盘。</div>
+          </div>
+        </div>
+        <div class="advantage">
+          <div class="adv-num">2</div>
+          <div class="adv-content">
+            <div class="adv-title">天然制衡，经济健康</div>
+            <div class="adv-desc"><span style="color:var(--ouyang)">欧洋</span>倾向多发代币，<span style="color:var(--jinyan)">金炎</span>倾向控制代币价值，两人形成制衡，避免经济失控。</div>
+          </div>
+        </div>
+        <div class="advantage">
+          <div class="adv-num">3</div>
+          <div class="adv-content">
+            <div class="adv-title">协作接口清晰，减少扯皮</div>
+            <div class="adv-desc">所有争议都可以回归到一个判断：<strong>这是"有什么"的问题，还是"用哪个/给多少"的问题？</strong>前者归金炎，后者归欧洋。</div>
+          </div>
+        </div>
+        <div class="advantage">
+          <div class="adv-num">4</div>
+          <div class="adv-content">
+            <div class="adv-title">有利于用户认知统一</div>
+            <div class="adv-desc">金炎统一管理世界观和产出物类型，不会再出现"货币体系冗余"——用户不再面对一堆搞不懂的代币。</div>
+          </div>
+        </div>
+        <div class="advantage">
+          <div class="adv-num">5</div>
+          <div class="adv-content">
+            <div class="adv-title">扩展性好</div>
+            <div class="adv-desc">未来新增教学场景，<span style="color:var(--ouyang)">欧洋</span>自主决定选型和剂量；新增消耗玩法，<span style="color:var(--jinyan)">金炎</span>自主设计闭环。只要遵守接口协议，两边独立迭代，互不阻塞。</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 七、冲突与解决 -->
+  <div class="section" id="s7">
+    <div class="section-header" onclick="toggleSection(this)">
+      <div class="section-num">7</div>
+      <div class="section-title">可能存在的冲突与解决机制</div>
+      <svg class="section-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+    </div>
+    <div class="section-body">
+      <div class="section-content">
+        <p style="font-size:13px;color:var(--text2);margin-bottom:16px;">分工再清晰，实际协作中必然遇到灰色地带。以下预判了5类高频冲突，以及对应的解决建议。</p>
+
+        <!-- 冲突一 -->
+        <div class="conflict">
+          <div class="conflict-header" onclick="toggleConflict(this)">
+            <span class="conflict-badge">冲突 1</span>
+            <span class="conflict-title">欧洋需要的新代币类型，金炎的世界观里没有</span>
+            <svg class="conflict-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+          </div>
+          <div class="conflict-body">
+            <div class="conflict-content">
+              <div class="vs-row">
+                <div class="vs-side vs-ouyang" style="font-size:12px;"><strong style="color:var(--ouyang)">欧洋视角</strong><br>我的教学场景需要这个激励手段</div>
+                <div class="vs-center">VS</div>
+                <div class="vs-side vs-jinyan" style="font-size:12px;"><strong style="color:var(--jinyan)">金炎视角</strong><br>加了会破坏体系一致性</div>
+              </div>
+              <div style="text-align:center;"><span class="conflict-nature">应用需求 vs 架构纯度</span></div>
+              <ul class="solution-list">
+                <li>欧洋先描述<strong>教学需求</strong>而非方案——"我需要一个能激励连续行为的机制"，而不是"我需要一个新代币叫坚持币"</li>
+                <li>金炎在世界观内寻找已有代币的<strong>变体方案</strong>——比如用海星的"连续加成倍率"代替新代币</li>
+                <li>如果确实需要新增类型，金炎负责将其纳入世界观体系，给出定义、定位、与现有体系的关系</li>
+              </ul>
+              <div class="judge">判断标准：这个需求能不能用现有代币体系满足？如果能，不加新类型；如果确实不能，金炎扩容</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 冲突二 -->
+        <div class="conflict">
+          <div class="conflict-header" onclick="toggleConflict(this)">
+            <span class="conflict-badge">冲突 2</span>
+            <span class="conflict-title">金炎要求限制代币产出量，欧洋认为会影响教学效果</span>
+            <svg class="conflict-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+          </div>
+          <div class="conflict-body">
+            <div class="conflict-content">
+              <div class="vs-row">
+                <div class="vs-side vs-ouyang" style="font-size:12px;"><strong style="color:var(--ouyang)">欧洋视角</strong><br>产出少了学生没动力</div>
+                <div class="vs-center">VS</div>
+                <div class="vs-side vs-jinyan" style="font-size:12px;"><strong style="color:var(--jinyan)">金炎视角</strong><br>产出多了代币贬值，养成闭环会崩</div>
+              </div>
+              <div style="text-align:center;"><span class="conflict-nature">教学效果 vs 经济健康</span></div>
+              <ul class="solution-list">
+                <li>金炎需要给出<strong>数据依据</strong>——"当前流通量X，消耗量Y，通胀率Z%，超过健康阈值"</li>
+                <li>欧洋需要给出<strong>替代方案</strong>——能否通过调整消耗端来平衡？</li>
+                <li>如果必须限产，金炎应提供<strong>分阶段方案</strong>而非一刀切</li>
+              </ul>
+              <div class="judge">判断标准：以用户整体体验为最终衡量——代币没价值，激励也没意义；激励不够，代币也没来源</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 冲突三 -->
+        <div class="conflict">
+          <div class="conflict-header" onclick="toggleConflict(this)">
+            <span class="conflict-badge">冲突 3</span>
+            <span class="conflict-title">道具在教学场景中的生效方式，两人意见不一致</span>
+            <svg class="conflict-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+          </div>
+          <div class="conflict-body">
+            <div class="conflict-content">
+              <div class="vs-row">
+                <div class="vs-side vs-ouyang" style="font-size:12px;"><strong style="color:var(--ouyang)">欧洋视角</strong><br>+10算力让数值膨胀，付费/非付费差距过大</div>
+                <div class="vs-center">VS</div>
+                <div class="vs-side vs-jinyan" style="font-size:12px;"><strong style="color:var(--jinyan)">金炎视角</strong><br>不在伴学场景生效就没有价值感</div>
+              </div>
+              <div style="text-align:center;"><span class="conflict-nature">游戏价值感 vs 教学平衡性</span></div>
+              <ul class="solution-list">
+                <li>回归"定义权 vs 生效权"原则——金炎有权定义属性，欧洋有权决定是否生效</li>
+                <li>欧洋不能无理由"屏蔽"——需要说明教学侧的具体顾虑</li>
+                <li>金炎可以调整<strong>数值大小</strong>来适配——比如从+10降到+3</li>
+              </ul>
+              <div class="judge">判断标准：道具属性的教学影响是否显著影响教学公平性或注意力？如果是，欧洋有否决权；如果只是"感觉不合适"，需要协商</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 冲突四（重点） -->
+        <div class="conflict">
+          <div class="conflict-header" onclick="toggleConflict(this)">
+            <span class="conflict-badge" style="background:rgba(167,139,250,0.2);color:var(--accent);">重点</span>
+            <span class="conflict-title">跨场景功能归属不清 — "编剧 vs 导演"模型</span>
+            <svg class="conflict-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+          </div>
+          <div class="conflict-body">
+            <div class="conflict-content">
+              <div class="vs-row">
+                <div class="vs-side vs-ouyang" style="font-size:12px;"><strong style="color:var(--ouyang)">欧洋视角</strong><br>触发时机和场景节奏是教学设计，归我管</div>
+                <div class="vs-center">VS</div>
+                <div class="vs-side vs-jinyan" style="font-size:12px;"><strong style="color:var(--jinyan)">金炎视角</strong><br>星仔说什么话、什么性格是世界观定义，归我管</div>
+              </div>
+              <div style="text-align:center;"><span class="conflict-nature">灰色地带的权属划分</span></div>
+
+              <div class="sd-model">
+                <div class="sd-model-title">🎬 "编剧 vs 导演"模型</div>
+                <div class="sd-model-desc">当同一个功能横跨"世界观定义"和"教学场景应用"时，用影视创作中的编剧与导演关系来拆分：</div>
+                <div class="sd-roles">
+                  <div class="sd-role sd-role-jy">
+                    <div class="sd-role-label">编剧</div>
+                    <div class="sd-role-val">金炎 = 定义角色"是什么"</div>
+                    <div style="font-size:12px;color:var(--text2);margin-top:4px;">性格、说话风格、行为准则</div>
+                  </div>
+                  <div class="sd-role sd-role-oy">
+                    <div class="sd-role-label">导演</div>
+                    <div class="sd-role-val">欧洋 = 决定角色"怎么出场"</div>
+                    <div style="font-size:12px;color:var(--text2);margin-top:4px;">触发时机、节奏、场景适配</div>
+                  </div>
+                </div>
+
+                <!-- 案例1 -->
+                <div class="case-section open">
+                  <div class="case-header" onclick="toggleCase(this)">
+                    <svg class="case-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg>
+                    案例1：课堂伴学中星仔的鼓励动效
+                  </div>
+                  <div class="case-body">
+                    <div class="case-content">
+                      <table class="tbl">
+                        <tr><th>维度</th><th style="color:var(--jinyan)">金炎（编剧）定义</th><th style="color:var(--ouyang)">欧洋（导演）决定</th></tr>
+                        <tr><td>星仔说什么</td><td>鼓励语的风格、语气、措辞体系</td><td>在什么教学节点触发哪类鼓励</td></tr>
+                        <tr><td>星仔怎么动</td><td>动效的风格基调（活泼、沉稳、害羞）</td><td>动效出现的时机和频率</td></tr>
+                        <tr><td>星仔的情绪</td><td>对不同学习结果的情绪反应规则</td><td>哪些情绪在教学场景中启用</td></tr>
+                      </table>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- 案例2 -->
+                <div class="case-section">
+                  <div class="case-header" onclick="toggleCase(this)">
+                    <svg class="case-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg>
+                    案例2：星仔皮肤/换装在教学场景的展示
+                  </div>
+                  <div class="case-body">
+                    <div class="case-content">
+                      <table class="tbl">
+                        <tr><th>维度</th><th style="color:var(--jinyan)">金炎（编剧）定义</th><th style="color:var(--ouyang)">欧洋（导演）决定</th></tr>
+                        <tr><td>皮肤的世界观设定</td><td>皮肤的来历故事、在星仔宇宙中的意义</td><td>在课堂伴学中是否展示、展示优先级</td></tr>
+                        <tr><td>皮肤的基础属性</td><td>皮肤自带的潜在数值加成</td><td>数值加成在本教学场景是否生效</td></tr>
+                        <tr><td>皮肤的视觉风格</td><td>皮肤的设计语言、与世界观的一致性</td><td>特定教学环节是否隐藏皮肤动效</td></tr>
+                      </table>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- 案例3 -->
+                <div class="case-section">
+                  <div class="case-header" onclick="toggleCase(this)">
+                    <svg class="case-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg>
+                    案例3：成就勋章在直播间的展示
+                  </div>
+                  <div class="case-body">
+                    <div class="case-content">
+                      <table class="tbl">
+                        <tr><th>维度</th><th style="color:var(--jinyan)">金炎（编剧）定义</th><th style="color:var(--ouyang)">欧洋（导演）决定</th></tr>
+                        <tr><td>勋章的类型和名称</td><td>勋章在世界观中的含义、命名规则、等级体系</td><td>哪些勋章在直播间展示、展示的位置和方式</td></tr>
+                        <tr><td>勋章的获取规则</td><td>达成什么行为获得什么勋章</td><td>勋章展示是否会干扰课堂注意力</td></tr>
+                      </table>
+                    </div>
+                  </div>
+                </div>
+
+                <div style="margin-top:16px;">
+                  <p style="font-size:14px;font-weight:700;margin-bottom:10px;">🧭 通用判断标准</p>
+                  <div style="padding:12px;background:var(--surface);border-radius:8px;margin-bottom:8px;font-size:13px;">
+                    <strong>1.</strong> 这个决策影响的是<strong style="color:var(--jinyan)">"角色是什么"</strong>还是<strong style="color:var(--ouyang)">"角色什么时候出现"</strong>？<br>
+                    → 前者金炎定，后者欧洋定
+                  </div>
+                  <div style="padding:12px;background:var(--surface);border-radius:8px;font-size:13px;">
+                    <strong>2.</strong> 这个决策如果不做，损害的是<strong style="color:var(--jinyan)">"世界观一致性"</strong>还是<strong style="color:var(--ouyang)">"教学效果"</strong>？<br>
+                    → 前者金炎优先，后者欧洋优先
+                  </div>
+                </div>
+
+                <div style="margin-top:16px;">
+                  <p style="font-size:14px;font-weight:700;margin-bottom:10px;">📝 协作方式</p>
+                  <ul class="solution-list">
+                    <li>金炎先输出<strong>"人设手册"</strong>——星仔的性格设定、语料风格、行为准则、情绪规则</li>
+                    <li>欧洋在"人设手册"范围内做场景编排，如需突破手册范围，向金炎提交需求</li>
+                    <li>金炎评估并扩充手册，确保世界观一致性不被破坏</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 冲突五 -->
+        <div class="conflict">
+          <div class="conflict-header" onclick="toggleConflict(this)">
+            <span class="conflict-badge">冲突 5</span>
+            <span class="conflict-title">数据对齐与协作节奏脱节</span>
+            <svg class="conflict-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+          </div>
+          <div class="conflict-body">
+            <div class="conflict-content">
+              <div style="text-align:center;margin-bottom:12px;"><span class="conflict-nature">协作机制执行不到位</span></div>
+              <ul class="solution-list">
+                <li>建立固定协作节奏（见下方协作日历）</li>
+                <li>产出数据由欧洋每周自动输出，金炎无需催要</li>
+                <li>经济调整由金炎每月初发布"经济月报"，欧洋知悉并据此调整剂量策略</li>
+              </ul>
+              <div class="judge">协作失职方承担主要责任——该交数据没交的，通胀问题不归金炎背；该看月报没看的，剂量失衡不归金炎补</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 协作日历 -->
+        <p style="font-size:16px;font-weight:700;margin:24px 0 14px;">📅 协作日历</p>
+        <div class="cal-item">
+          <span class="cal-freq">季度</span>
+          <span class="cal-who cal-jinyan">金炎</span>
+          <span class="cal-what">发布/更新激励体系框架</span>
+          <span class="cal-output">代币类型清单、世界观规则更新</span>
+        </div>
+        <div class="cal-item">
+          <span class="cal-freq">每周</span>
+          <span class="cal-who cal-ouyang">欧洋</span>
+          <span class="cal-what">输出代币产出数据</span>
+          <span class="cal-output">各场景代币产出量、激励效果数据</span>
+        </div>
+        <div class="cal-item">
+          <span class="cal-freq">每月</span>
+          <span class="cal-who cal-jinyan">金炎</span>
+          <span class="cal-what">发布经济月报</span>
+          <span class="cal-output">通胀率、物价指数、兑换率、调控计划</span>
+        </div>
+        <div class="cal-item">
+          <span class="cal-freq">每月</span>
+          <span class="cal-who cal-both">双方</span>
+          <span class="cal-what">对齐会（30分钟）</span>
+          <span class="cal-output">同步调整计划，预警潜在冲突</span>
+        </div>
+        <div class="cal-item">
+          <span class="cal-freq">即时</span>
+          <span class="cal-who cal-ouyang">欧洋→金炎</span>
+          <span class="cal-what">新增代币类型/道具需求提交</span>
+          <span class="cal-output">需求评估结果（纳入/变体/驳回）</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 八、总结 -->
+  <div class="section" id="s8">
+    <div class="section-header" onclick="toggleSection(this)">
+      <div class="section-num">8</div>
+      <div class="section-title">总结</div>
+      <svg class="section-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+    </div>
+    <div class="section-body">
+      <div class="section-content">
+        <div class="summary-grid">
+          <div class="summary-cell summary-label"></div>
+          <div class="summary-cell summary-label" style="text-align:center;color:var(--jinyan);font-size:13px;">金炎 · 游戏化激励产品经理</div>
+          <div class="summary-cell summary-label" style="text-align:center;color:var(--ouyang);font-size:13px;">欧洋 · 教学产品经理</div>
+
+          <div class="summary-cell summary-label">角色比喻</div>
+          <div class="summary-cell summary-jy">世界架构师 + 经济治理者</div>
+          <div class="summary-cell summary-oy">场景应用者 + 剂量调节者</div>
+
+          <div class="summary-cell summary-label">一句话</div>
+          <div class="summary-cell summary-jy">代币到哪去</div>
+          <div class="summary-cell summary-oy">代币从哪来</div>
+
+          <div class="summary-cell summary-label">决定什么</div>
+          <div class="summary-cell summary-jy">有什么、值多少、世界观</div>
+          <div class="summary-cell summary-oy">用哪个、给多少、注意力</div>
+
+          <div class="summary-cell summary-label">核心KPI</div>
+          <div class="summary-cell summary-jy">代币消耗率、养成深度、用户留存</div>
+          <div class="summary-cell summary-oy">参课率、答题率、课堂互动率</div>
+
+          <div class="summary-cell summary-label">输入</div>
+          <div class="summary-cell summary-jy">欧洋的产出数据</div>
+          <div class="summary-cell summary-oy">金炎的可用菜单与世界观规则</div>
+
+          <div class="summary-cell summary-label">输出</div>
+          <div class="summary-cell summary-jy">世界观规则、代币类型、消耗闭环、经济调控</div>
+          <div class="summary-cell summary-oy">场景激励选型、剂量配置、教学效果反馈</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+function toggleSection(header) {
+  const section = header.parentElement;
+  section.classList.toggle('open');
+}
+
+function toggleConflict(header) {
+  const conflict = header.parentElement;
+  conflict.classList.toggle('open');
+}
+
+function toggleCase(header) {
+  const caseSection = header.parentElement;
+  caseSection.classList.toggle('open');
+}
+
+function toggleAll(open) {
+  document.querySelectorAll('.section').forEach(s => {
+    if (open) s.classList.add('open');
+    else s.classList.remove('open');
+  });
+  document.querySelectorAll('.conflict').forEach(c => {
+    if (open) c.classList.add('open');
+    else c.classList.remove('open');
+  });
+  document.querySelectorAll('.case-section').forEach(c => {
+    if (open) c.classList.add('open');
+    else c.classList.remove('open');
+  });
+}
+
+function scrollToSection(id) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  const section = el;
+  if (!section.classList.contains('open')) {
+    section.classList.add('open');
+  }
+  section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  // Update nav active state
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  const idx = Array.from(document.querySelectorAll('.section')).indexOf(section);
+  const navBtns = document.querySelectorAll('.nav-btn');
+  if (navBtns[idx]) navBtns[idx].classList.add('active');
+}
+
+// Scroll spy
+const sections = document.querySelectorAll('.section');
+const navBtns = document.querySelectorAll('.nav-btn');
+const observer = new IntersectionObserver(entries => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      const idx = Array.from(sections).indexOf(entry.target);
+      navBtns.forEach(b => b.classList.remove('active'));
+      if (navBtns[idx]) navBtns[idx].classList.add('active');
+    }
+  });
+}, { rootMargin: '-80px 0px -70% 0px' });
+sections.forEach(s => observer.observe(s));
+
+// Open first section by default
+document.querySelector('.section').classList.add('open');
+</script>
+</body>
+</html>
